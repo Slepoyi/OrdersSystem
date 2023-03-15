@@ -9,7 +9,7 @@ namespace OrdersSystem.Api.Controllers
     public class OrderPickerController : ControllerBase
     {
         [HttpPost("{id}")]
-        public async Task<IActionResult> CloseOrderAsync(Guid id, [FromBody] IEnumerable<OrderSku> orderSku)
+        public async Task<IActionResult> CloseOrderAsync(Guid id, [FromBody] IEnumerable<Sku> orderSku)
         {
             var closed = _orderManager.CloseOrder(id, orderSku, User.Identity.Name);
             if (!closed)

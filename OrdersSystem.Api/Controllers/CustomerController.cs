@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OrdersSystem.Data.Process.Validation;
 using OrdersSystem.Domain.Models;
 
 namespace OrdersSystem.Api.Controllers
@@ -8,10 +9,14 @@ namespace OrdersSystem.Api.Controllers
     [ApiController]
     public class CustomerController : ControllerBase
     {
+        private readonly OrderValidator _orderValidator;
+
         [HttpPost]
-        public async Task<IActionResult> CreateOrderAsync([FromBody] IEnumerable<OrderSku> orderSku)
+        public async Task<IActionResult> CreateOrderAsync([FromBody] Dictionary<Sku, uint> orderSku)
         {
-            if (!_orderValidator.Validate(orderSku))
+
+
+            if (!_orderValidator.ValidateOrder(orderSku))
                 return ValidationProblemsList; // 400 with custom message
 
             var guid = _orderManager.CreateOrderAsync(orderSku);
