@@ -5,25 +5,15 @@ namespace OrdersSystem.Domain.Models
     public class Sku
     {
         public Sku(Guid id, string name,
-            string description, double cost,
-            uint stockBalance, byte[] photo)
+            string description, decimal price,
+            uint stockBalance, byte[]? photo)
         {
             Id = id;
             Name = name;
             Description = description;
-            Cost = cost;
+            Price = price;
             StockBalance = stockBalance;
             Photo = photo;
-        }
-        public Sku(Guid id, string name,
-            string description, double cost,
-            uint stockBalance)
-        {
-            Id = id;
-            Name = name;
-            Description = description;
-            Cost = cost;
-            StockBalance = stockBalance;
         }
 
         [Key]
@@ -33,7 +23,7 @@ namespace OrdersSystem.Domain.Models
         [Required]
         public string Description { get; private set; }
         [Required]
-        public double Cost { get; private set; }
+        public decimal Price { get; private set; }
         [Required]
         public uint StockBalance { get; private set; }
         public byte[]? Photo { get; private set; }
