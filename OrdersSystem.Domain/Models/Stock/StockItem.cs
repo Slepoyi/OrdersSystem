@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace OrdersSystem.Domain.Models
+namespace OrdersSystem.Domain.Models.Stock
 {
     public class StockItem
     {

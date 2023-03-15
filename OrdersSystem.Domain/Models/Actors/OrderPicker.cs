@@ -1,6 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using OrdersSystem.Domain.Models.Ordering;
+using System.ComponentModel.DataAnnotations;
 
-namespace OrdersSystem.Domain.Models
+namespace OrdersSystem.Domain.Models.Actors
 {
     public class OrderPicker
     {

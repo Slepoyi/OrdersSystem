@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace OrdersSystem.Domain.Models
+namespace OrdersSystem.Domain.Models.Stock
 {
     public class Sku
     {
         public Sku(Guid id, string name,
-            string description, decimal price,
-            byte[]? photo)
+          string description, decimal price,
+          byte[]? photo)
         {
             Id = id;
             Name = name;
