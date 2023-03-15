@@ -6,13 +6,12 @@ namespace OrdersSystem.Domain.Models
     {
         public Sku(Guid id, string name,
             string description, decimal price,
-            uint stockBalance, byte[]? photo)
+            byte[]? photo)
         {
             Id = id;
             Name = name;
             Description = description;
             Price = price;
-            StockBalance = stockBalance;
             Photo = photo;
         }
 
@@ -24,8 +23,6 @@ namespace OrdersSystem.Domain.Models
         public string Description { get; private set; }
         [Required]
         public decimal Price { get; private set; }
-        [Required]
-        public uint StockBalance { get; private set; }
         public byte[]? Photo { get; private set; }
     }
 }
