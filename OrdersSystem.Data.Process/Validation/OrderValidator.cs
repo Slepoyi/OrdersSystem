@@ -1,40 +1,41 @@
-﻿using OrdersSystem.Domain.Models;
+﻿using OrdersSystem.Domain.Models.Ordering;
+using OrdersSystem.Domain.Models.Stock;
 
 namespace OrdersSystem.Data.Process.Validation
 {
-    public class OrderValidator
+    internal class OrderValidator : IOrderValidator
     {
-        public ValidationResult ValidateOrder(Dictionary<Sku, uint> order, IEnumerable<StockItem> stock)
+        public ValidationResult ValidateOrder(IEnumerable<OrderItem> order, IEnumerable<StockItem> stock)
         {
             var result = new ValidationResult();
 
             foreach (var orderItem in order)
             {
-                var stockItem = stock.FirstOrDefault(s => s.Sku.Id == orderItem.Key.Id);
+                var stockItem = stock.FirstOrDefault(s => s.Sku.Id == orderItem.Sku.Id);
                 ValidateOrderItem(result, orderItem, stockItem);
             }
 
             return result;
         }
 
-        private void ValidateOrderItem(ValidationResult result, KeyValuePair<Sku, uint> orderItem, StockItem? stockItem)
+        private void ValidateOrderItem(ValidationResult result, OrderItem orderItem, StockItem? stockItem)
         {
             if (stockItem is null)
             {
                 result.IsValid = false;
-                result.ErrorMessages.Add($"Sku '{orderItem.Key.Name}' not found in stock.");
+                result.ErrorMessages.Add($"Sku '{orderItem.Sku.Name}' not found in stock.");
                 result.ErrorCodes.Add(OrderErrorCode.SkuIdNotFound);
             }
-            else if (stockItem.StockBalance < orderItem.Value)
+            else if (stockItem.StockBalance < orderItem.Amount)
             {
                 result.IsValid = false;
-                result.ErrorMessages.Add($"Insufficient stock for sku '{orderItem.Key.Name}'.");
+                result.ErrorMessages.Add($"Insufficient stock for sku '{orderItem.Sku.Name}'.");
                 result.ErrorCodes.Add(OrderErrorCode.InsufficientSkuStock);
             }
-            else if (stockItem.Sku.Price != orderItem.Key.Price)
+            else if (stockItem.Sku.Price != orderItem.Sku.Price)
             {
                 result.IsValid = false;
-                result.ErrorMessages.Add($"Wrong price {orderItem.Key.Price} for '{orderItem.Key.Name}'.");
+                result.ErrorMessages.Add($"Wrong price {orderItem.Sku.Price} for '{orderItem.Sku.Name}'.");
                 result.ErrorCodes.Add(OrderErrorCode.WrongSkuPrice);
             }
         }
