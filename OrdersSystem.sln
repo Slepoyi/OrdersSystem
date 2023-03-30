@@ -7,15 +7,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9EE63AE7-F46
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F1400754-D67B-4C40-B833-11C9BD749693}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrdersSystem.Domain", "OrdersSystem.Domain\OrdersSystem.Domain.csproj", "{D9D30EAE-246B-42D7-8E49-BB95AB028CD7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrdersSystem.Domain", "OrdersSystem.Domain\OrdersSystem.Domain.csproj", "{D9D30EAE-246B-42D7-8E49-BB95AB028CD7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrdersSystem.UnitTests", "OrdersSystem.UnitTests\OrdersSystem.UnitTests.csproj", "{B25C5C1D-A985-4327-B09C-E68286B5A409}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrdersSystem.UnitTests", "OrdersSystem.UnitTests\OrdersSystem.UnitTests.csproj", "{B25C5C1D-A985-4327-B09C-E68286B5A409}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrdersSystem.Api", "OrdersSystem.Api\OrdersSystem.Api.csproj", "{0C0D51CB-BEC4-478D-85CB-C665EE025987}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrdersSystem.Api", "OrdersSystem.Api\OrdersSystem.Api.csproj", "{0C0D51CB-BEC4-478D-85CB-C665EE025987}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrdersSystem.Data.Access", "OrdersSystem.Data.Access\OrdersSystem.Data.Access.csproj", "{1692AED4-21B3-4132-8CC6-00CB4EA41724}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrdersSystem.Data.Access", "OrdersSystem.Data.Access\OrdersSystem.Data.Access.csproj", "{1692AED4-21B3-4132-8CC6-00CB4EA41724}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrdersSystem.Data.Process", "OrdersSystem.Data.Process\OrdersSystem.Data.Process.csproj", "{0CCBF510-6070-4FD6-8019-147E9271FCCA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrdersSystem.Data.Process", "OrdersSystem.Data.Process\OrdersSystem.Data.Process.csproj", "{0CCBF510-6070-4FD6-8019-147E9271FCCA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1692AED4-21B3-4132-8CC6-00CB4EA41724} = {1692AED4-21B3-4132-8CC6-00CB4EA41724}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
