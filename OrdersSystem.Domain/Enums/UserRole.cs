@@ -1,5 +1,10 @@
-﻿public enum UserRole
+﻿namespace OrdersSystem.Domain.Enums
 {
-    Customer,
-    Picker
+    public static class UserRole
+    {
+
+        public const string Customer = "Customer";
+        public const string Picker = "Picker"; 
+        
+    }
 }
