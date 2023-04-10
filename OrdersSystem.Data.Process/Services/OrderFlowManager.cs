@@ -21,10 +21,9 @@ namespace OrdersSystem.Data.Process.Services
         public async Task<Order?> GetByGuidAsync(Guid id)
         {
             return await _applicationContext.Orders
-                .Where(o => o.Id == id)
                 .Include(o => o.Customer)
                 .Include(o => o.OrderPicker)
-                .SingleOrDefaultAsync();
+                .FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public IEnumerable<StockItem> GetStockForOrderItems(IEnumerable<OrderItem> orderItems)
@@ -112,7 +111,7 @@ namespace OrdersSystem.Data.Process.Services
         {
             foreach (var stockItem in stockItems)
             {
-                var orderItem = order.OrderItems.Where(s => s.Sku == stockItem.Sku).FirstOrDefault();
+                var orderItem = order.OrderItems.FirstOrDefault(s => s.Sku == stockItem.Sku);
                 stockItem.ReduceBalance(orderItem.Amount);
                 await _applicationContext.SaveChangesAsync();
             }
@@ -124,7 +123,7 @@ namespace OrdersSystem.Data.Process.Services
 
             foreach (var stockItem in stockItems)
             {
-                var orderItem = order.OrderItems.Where(s => s.Sku == stockItem.Sku).FirstOrDefault();
+                var orderItem = order.OrderItems.FirstOrDefault(s => s.Sku == stockItem.Sku);
                 stockItem.IncreaseBalance(orderItem.Amount);
                 await _applicationContext.SaveChangesAsync();
             }
@@ -146,24 +145,5 @@ namespace OrdersSystem.Data.Process.Services
             order.CloseTime = closeTime;
             return true;
         }
-    //    I am writing an ordering system.I have 2 classes: `OrderItem` represents an item which user tries wants to order and `StockItem` which represents stock balance for the sku. Code of the above mentioned classes is below:
-
-    //public class OrderItem
-    //    {
-    //        [Required]
-    //        public Sku Sku { get; private set; }
-    //        [Required]
-    //        public uint Amount { get; private set; }
-    //    }
-
-    //    public class StockItem
-    //    {
-    //        [Required]
-    //        public Sku Sku { get; private set; }
-    //        [Required]
-    //        public uint StockBalance { get; private set; }
-    //    }
-
-    //    I get IEnumerable<OrderItem> from a customer.Next, I need to validate the order and as a step of validation I need to check if `OrderItem.Sku` is presented on stock.If everything is fine I want to change
     }
 }
