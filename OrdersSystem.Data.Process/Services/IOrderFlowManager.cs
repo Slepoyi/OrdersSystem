@@ -9,7 +9,10 @@ namespace OrdersSystem.Data.Process.Services
         ValidationResult ValidateOrder(IEnumerable<OrderItem> orderItems, IEnumerable<StockItem> stockItems);
         IEnumerable<StockItem> GetStockForOrderItems(IEnumerable<OrderItem> orderItems);
         Task<Order?> GetByGuidAsync(Guid id);
-        Task<Order?> CreateOrderAsync(IEnumerable<OrderItem> orderItems, Guid userGuid, IEnumerable<StockItem> stockItems);
+        Task<Order?> CreateOrderAsync(List<OrderItem> orderItems, Guid userGuid, IEnumerable<StockItem> stockItems);
         Task<bool> CancelOrderAsync(Order order);
+        Task<Order?> GetNextOrderAsync();
+        Task<bool> BeginOrderPickingAsync(Order order, Guid userGuid);
+        Task<bool> CloseOrder(Order order, Guid userGuid);
     }
 }

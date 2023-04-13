@@ -13,6 +13,13 @@ namespace OrdersSystem.Data.Process.Services
         private readonly IOrderValidator _orderValidator;
         private readonly IClock _clock;
 
+        public OrderFlowManager(ApplicationContext applicationContext, IOrderValidator orderValidator, IClock clock)
+        {
+            _applicationContext = applicationContext;
+            _orderValidator = orderValidator;
+            _clock = clock;
+        }
+
         public ValidationResult ValidateOrder(IEnumerable<OrderItem> orderItems, IEnumerable<StockItem> stockItems)
         {
             return _orderValidator.ValidateOrder(orderItems, stockItems);
@@ -37,20 +44,59 @@ namespace OrdersSystem.Data.Process.Services
                 o => o.Sku,
                 (s, o) => s);
             }
-            catch (Exception)
-            {
-            
-            }
+            catch (Exception) { }
 
             return stock;
         }
 
-        public async Task<Order?> CreateOrderAsync(IEnumerable<OrderItem> orderItems, Guid userGuid, IEnumerable<StockItem> stockItems)
+        public Task<Order?> GetNextOrderAsync()
+        {
+            return _applicationContext.Orders.OrderBy(o => o.OpenTime).FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> BeginOrderPickingAsync(Order order, Guid userGuid)
+        {
+            OrderPicker? picker = default;
+            try
+            {
+                picker = await _applicationContext.OrderPickers.FindAsync(userGuid);
+            }
+            catch (Exception) { }
+            if (picker is null)
+                return false;
+
+            order.OrderPicker = picker;
+            order.OrderStatus = OrderStatus.Processing;
+            order.PickingStartTime = _clock.Now;
+            await _applicationContext.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> CloseOrder(Order order, Guid userGuid)
+        {
+            OrderPicker? picker = default;
+            try
+            {
+                picker = await _applicationContext.OrderPickers.FindAsync(userGuid);
+            }
+            catch (Exception) { }
+            if (picker is null)
+                return false;
+
+            if (order.OrderStatus != OrderStatus.Processing)
+                return false;
+
+            order.OrderStatus = OrderStatus.Finished;
+            order.CloseTime = _clock.Now;
+            return true;
+        }
+
+        public async Task<Order?> CreateOrderAsync(List<OrderItem> orderItems, Guid userGuid, IEnumerable<StockItem> stockItems)
         {
             Customer? customer = default;
             try
             {
-                customer = _applicationContext.Customers.Find(userGuid);
+                customer = await _applicationContext.Customers.FindAsync(userGuid);
             }
             catch (Exception) { }
             if (customer is null)
@@ -62,19 +108,6 @@ namespace OrdersSystem.Data.Process.Services
                 return null;
 
             return order;
-        }
-
-        private bool AddOrderToDatabase(Order order)
-        {
-            try
-            {
-                _applicationContext.Orders.Add(order);
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
         }
 
         public async Task<bool> CancelOrderAsync(Order order)
@@ -106,13 +139,25 @@ namespace OrdersSystem.Data.Process.Services
 
             return true;
         }
+        private bool AddOrderToDatabase(Order order)
+        {
+            try
+            {
+                _applicationContext.Orders.Add(order);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
 
         private async Task AddOrderReserveAsync(Order order, IEnumerable<StockItem> stockItems)
         {
             foreach (var stockItem in stockItems)
             {
                 var orderItem = order.OrderItems.FirstOrDefault(s => s.Sku == stockItem.Sku);
-                stockItem.ReduceBalance(orderItem.Amount);
+                stockItem.ReduceBalance(orderItem.Quantity);
                 await _applicationContext.SaveChangesAsync();
             }
         }
@@ -124,25 +169,10 @@ namespace OrdersSystem.Data.Process.Services
             foreach (var stockItem in stockItems)
             {
                 var orderItem = order.OrderItems.FirstOrDefault(s => s.Sku == stockItem.Sku);
-                stockItem.IncreaseBalance(orderItem.Amount);
+                stockItem.IncreaseBalance(orderItem.Quantity);
                 await _applicationContext.SaveChangesAsync();
             }
 
-            return true;
-        }
-
-        private async Task<Order?> GetOrderWithEarliestOpenDateAsync()
-        {
-            return await _applicationContext.Orders.OrderBy(o => o.OpenTime).FirstOrDefaultAsync();
-        }
-
-        public bool CloseOrder(DateTime closeTime, Order order)
-        {
-            if (order.OrderStatus == OrderStatus.Finished)
-                return false;
-
-            order.OrderStatus = OrderStatus.Finished;
-            order.CloseTime = closeTime;
             return true;
         }
     }
