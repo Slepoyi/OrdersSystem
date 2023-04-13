@@ -3,7 +3,7 @@ using OrdersSystem.Domain.Models.Stock;
 
 namespace OrdersSystem.Data.Process.Validation
 {
-    internal class OrderValidator : IOrderValidator
+    public class OrderValidator : IOrderValidator
     {
         public ValidationResult ValidateOrder(IEnumerable<OrderItem> order, IEnumerable<StockItem> stock)
         {
@@ -26,7 +26,7 @@ namespace OrdersSystem.Data.Process.Validation
                 result.ErrorMessages.Add($"Sku '{orderItem.Sku.Name}' not found in stock.");
                 result.ErrorCodes.Add(OrderErrorCode.SkuIdNotFound);
             }
-            else if (stockItem.StockBalance < orderItem.Amount)
+            else if (stockItem.StockBalance < orderItem.Quantity)
             {
                 result.IsValid = false;
                 result.ErrorMessages.Add($"Insufficient stock for sku '{orderItem.Sku.Name}'.");

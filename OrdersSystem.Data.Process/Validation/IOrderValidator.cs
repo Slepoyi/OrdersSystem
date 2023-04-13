@@ -3,7 +3,7 @@ using OrdersSystem.Domain.Models.Stock;
 
 namespace OrdersSystem.Data.Process.Validation
 {
-    internal interface IOrderValidator
+    public interface IOrderValidator
     {
         ValidationResult ValidateOrder(IEnumerable<OrderItem> order, IEnumerable<StockItem> stock);
     }
