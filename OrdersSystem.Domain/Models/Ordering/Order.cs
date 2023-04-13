@@ -5,7 +5,7 @@ namespace OrdersSystem.Domain.Models.Ordering
     public class Order
     {
         public Order(Customer customer, DateTime openTime,
-          IEnumerable<OrderItem> skus)
+          List<OrderItem> skus)
         {
             Id = Guid.NewGuid();
             Customer = customer;
@@ -18,53 +18,46 @@ namespace OrdersSystem.Domain.Models.Ordering
         [Required]
         public Customer Customer { get; private set; }
         public DateTime OpenTime { get; private set; }
-        public IEnumerable<OrderItem> OrderItems { get; private set; }
+        public List<OrderItem> OrderItems { get; private set; }
         public DateTime PickingStartTime { get; set; }
         public DateTime CloseTime { get; set; }
         public OrderPicker? OrderPicker { get; set; }
         public OrderStatus OrderStatus { get; set; }
 
-        //public decimal GetTotalPrice()
-        //{
-        //    decimal totalPrice = 0;
+        public decimal GetTotalPrice()
+        {
+            decimal totalPrice = 0;
 
-        //    foreach (KeyValuePair<Sku, int> skuQuantityPair in Skus)
-        //    {
-        //        var sku = skuQuantityPair.Key;
-        //        var quantity = skuQuantityPair.Value;
-        //        totalPrice += sku.Price * quantity;
-        //    }
+            foreach (var item in OrderItems)
+            {
+                totalPrice += item.Quantity * item.Sku.Price;
+            }
 
-        //    return totalPrice;
-        //}
+            return totalPrice;
+        }
 
-        //public bool RemoveSku(Sku sku, int quantity)
-        //{
-        //    if (!Skus.ContainsKey(sku))
-        //        return false;
+        public bool ReduceSku(OrderItem item, uint quantity)
+        {
+            var currentItem = OrderItems.FirstOrDefault(s => s.Sku == item.Sku);
+            if (currentItem is null)
+                return false;
 
-        //    var currentQuantity = Skus[sku];
-        //    if (currentQuantity <= quantity)
-        //    {
-        //        Skus.Remove(sku);
-        //    }
-        //    else
-        //    {
-        //        Skus[sku] = currentQuantity - quantity;
-        //    }
-        //    return true;
-        //}
+            if (currentItem.Quantity <= quantity)
+                OrderItems.Remove(currentItem);
+            else
+                currentItem.Quantity -= quantity;
 
-        //public void AddSku(Sku sku, int quantity)
-        //{
-        //    if (Skus.ContainsKey(sku))
-        //    {
-        //        Skus[sku] += quantity;
-        //    }
-        //    else
-        //    {
-        //        Skus[sku] = quantity;
-        //    }
-        //}
+            return true;
+        }
+
+        public void AddSku(OrderItem item, uint quantity)
+        {
+            var currentItem = OrderItems.FirstOrDefault(s => s.Sku == item.Sku);
+
+            if (currentItem is null)
+                OrderItems.Add(item);
+            else
+                currentItem.Quantity += quantity;
+        }
     }
 }
