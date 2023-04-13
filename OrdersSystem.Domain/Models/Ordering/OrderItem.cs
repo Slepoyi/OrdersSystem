@@ -5,15 +5,15 @@ namespace OrdersSystem.Domain.Models.Ordering
 {
     public class OrderItem
     {
-        public OrderItem(Sku sku, uint amount)
+        public OrderItem(Sku sku, uint quantity)
         {
             Sku = sku;
-            Amount = amount;
+            Quantity = quantity;
         }
 
         [Required]
         public Sku Sku { get; private set; }
         [Required]
-        public uint Amount { get; private set; }
+        public uint Quantity { get; set; }
     }
 }
