@@ -10,6 +10,11 @@ namespace OrdersSystem.Api.Controllers
     {
         private readonly IJwtService _jwtService;
 
+        public AuthenticationController(IJwtService jwtService)
+        {
+            _jwtService = jwtService;
+        }
+
         [HttpPost("authenticate/")]
         public IActionResult Authenticate([FromBody] User model)
         {

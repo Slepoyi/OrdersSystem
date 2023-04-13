@@ -14,9 +14,11 @@ namespace OrdersSystem.Api.Controllers
     {
         private readonly IOrderFlowManager _orderManager;
 
-        // create user order
-        // all skus are reserved in database
-        // return guid of order or error
+        public CustomerController(IOrderFlowManager orderManager)
+        {
+            _orderManager = orderManager;
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateOrderAsync([FromBody] IEnumerable<OrderItem> orderItems)
         {
@@ -29,15 +31,13 @@ namespace OrdersSystem.Api.Controllers
             if (!validationResult.IsValid)
                 return BadRequest(validationResult.ErrorMessages);
 
-            var order = await _orderManager.CreateOrderAsync(orderItems, user.Id, stockItems);
+            var order = await _orderManager.CreateOrderAsync(orderItems.ToList(), user.Id, stockItems);
             if (order is null)
                 return BadRequest();
 
             return CreatedAtAction(nameof(GetByGuidAsync), new { id = order.Id }, order);
         }
 
-        // cancel order if possible
-        // rollback of reserve
         [HttpPost("{id}")]
         public async Task<IActionResult> CancelOrderAsync(Guid id)
         {
