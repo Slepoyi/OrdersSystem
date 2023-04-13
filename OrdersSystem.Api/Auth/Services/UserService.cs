@@ -19,7 +19,7 @@ namespace OrdersSystem.Api.Auth.Services
         }
 
         public User? GetCurrentAuthenticatedUser()
-            => _httpContextAccessor.HttpContext.Items["User"] as User;
+            => _httpContextAccessor.HttpContext?.Items["User"] as User;
 
         public async Task<User?> GetByIdConsideringPasswordAsync(Guid id, string password)
         {
