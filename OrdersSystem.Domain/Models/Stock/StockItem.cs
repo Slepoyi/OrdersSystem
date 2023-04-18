@@ -1,16 +1,21 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace OrdersSystem.Domain.Models.Stock
 {
     public class StockItem
     {
-        public StockItem(Sku sku, uint stockBalance)
+        public StockItem(Sku sku, uint stockBalance) : this(stockBalance)
         {
             Sku = sku;
+        }
+
+        private StockItem(uint stockBalance) : base()
+        {
             StockBalance = stockBalance;
         }
 
-        [Required]
+        [Key]
         public Sku Sku { get; private set; }
         [Required]
         public uint StockBalance { get; private set; }

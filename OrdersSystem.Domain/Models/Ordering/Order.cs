@@ -5,12 +5,16 @@ namespace OrdersSystem.Domain.Models.Ordering
     public class Order
     {
         public Order(Customer customer, DateTime openTime,
-          List<OrderItem> skus)
+          List<OrderItem> skus) : this(openTime)
+        {
+            Customer = customer;
+            OrderItems = skus;
+        }
+
+        private Order(DateTime openTime) : base()
         {
             Id = Guid.NewGuid();
-            Customer = customer;
             OpenTime = openTime;
-            OrderItems = skus;
         }
 
         [Key]
