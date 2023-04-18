@@ -20,8 +20,7 @@ namespace OrdersSystem.Api.Auth.Middleware
             if (allowAnonymous)
                 return;
 
-            var user = context.HttpContext.Items["User"] as User;
-            if (user is null)
+            if (context.HttpContext.Items["User"] is not User user)
             {
                 context.Result = new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
                 return;
