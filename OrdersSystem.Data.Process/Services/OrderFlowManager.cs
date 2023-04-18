@@ -35,16 +35,11 @@ namespace OrdersSystem.Data.Process.Services
 
         public IEnumerable<StockItem> GetStockForOrderItems(IEnumerable<OrderItem> orderItems)
         {
-            IEnumerable<StockItem> stock = Enumerable.Empty<StockItem>();
-            try
-            {
-                stock = _applicationContext.StockItems
-                .Join(orderItems,
-                s => s.Sku,
-                o => o.Sku,
-                (s, o) => s);
-            }
-            catch (Exception) { }
+            var stock = _applicationContext.StockItems
+               .Join(orderItems,
+               s => s.Sku,
+               o => o.Sku,
+               (s, o) => s);
 
             return stock;
         }
@@ -56,12 +51,7 @@ namespace OrdersSystem.Data.Process.Services
 
         public async Task<bool> BeginOrderPickingAsync(Order order, Guid userGuid)
         {
-            OrderPicker? picker = default;
-            try
-            {
-                picker = await _applicationContext.OrderPickers.FindAsync(userGuid);
-            }
-            catch (Exception) { }
+            var picker = await _applicationContext.OrderPickers.FindAsync(userGuid);
             if (picker is null)
                 return false;
 
@@ -74,17 +64,14 @@ namespace OrdersSystem.Data.Process.Services
 
         public async Task<bool> CloseOrder(Order order, Guid userGuid)
         {
-            OrderPicker? picker = default;
-            try
-            {
-                picker = await _applicationContext.OrderPickers.FindAsync(userGuid);
-            }
-            catch (Exception) { }
+            var picker = await _applicationContext.OrderPickers.FindAsync(userGuid);
             if (picker is null)
                 return false;
 
             if (order.OrderStatus != OrderStatus.Processing)
                 return false;
+
+            await RollbackOrderReservePart(order);
 
             order.OrderStatus = OrderStatus.Finished;
             order.CloseTime = _clock.Now;
@@ -93,19 +80,13 @@ namespace OrdersSystem.Data.Process.Services
 
         public async Task<Order?> CreateOrderAsync(List<OrderItem> orderItems, Guid userGuid, IEnumerable<StockItem> stockItems)
         {
-            Customer? customer = default;
-            try
-            {
-                customer = await _applicationContext.Customers.FindAsync(userGuid);
-            }
-            catch (Exception) { }
+            var customer = await _applicationContext.Customers.FindAsync(userGuid);
             if (customer is null)
                 return null;
 
             var order = new Order(customer, _clock.Now, orderItems);
 
-            if (!await ReserveOrderInDatabaseAsync(order, stockItems))
-                return null;
+            await ReserveOrderInDatabaseAsync(order, stockItems);
 
             return order;
         }
@@ -115,65 +96,54 @@ namespace OrdersSystem.Data.Process.Services
             if (order.OrderStatus != OrderStatus.Created)
                 return false;
 
-            if (! await DeleteOrderReserveAsync(order))
-                return false;
+            await DeleteOrderReserveAsync(order);
 
-            try
-            {
-                _applicationContext.Orders.Remove(order);
-                await _applicationContext.SaveChangesAsync();
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            _applicationContext.Orders.Remove(order);
+            await _applicationContext.SaveChangesAsync();
+            return true;
         }
 
         private async Task<bool> ReserveOrderInDatabaseAsync(Order order, IEnumerable<StockItem> stockItems)
         {
-            if (!AddOrderToDatabase(order))
-                return false;
-
+            await _applicationContext.Orders.AddAsync(order);
             await AddOrderReserveAsync(order, stockItems);
+            await _applicationContext.SaveChangesAsync();
 
             return true;
         }
-        private bool AddOrderToDatabase(Order order)
-        {
-            try
-            {
-                _applicationContext.Orders.Add(order);
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
 
-        private async Task AddOrderReserveAsync(Order order, IEnumerable<StockItem> stockItems)
+        private async Task<bool> AddOrderReserveAsync(Order order, IEnumerable<StockItem> stockItems)
         {
             foreach (var stockItem in stockItems)
             {
                 var orderItem = order.OrderItems.FirstOrDefault(s => s.Sku == stockItem.Sku);
+                var reserveItem = await _applicationContext.ReservedItems.FirstOrDefaultAsync(s => s.Sku == orderItem.Sku);
                 stockItem.ReduceBalance(orderItem.Quantity);
-                await _applicationContext.SaveChangesAsync();
+                if (reserveItem is null)
+                    await _applicationContext.ReservedItems.AddAsync(new StockItem(orderItem.Sku, orderItem.Quantity));
+                else
+                    reserveItem.IncreaseBalance(orderItem.Quantity);
             }
+            return true;
         }
 
-        private async Task<bool> DeleteOrderReserveAsync(Order order)
+        private async Task DeleteOrderReserveAsync(Order order)
         {
             var stockItems = GetStockForOrderItems(order.OrderItems);
-
             foreach (var stockItem in stockItems)
             {
                 var orderItem = order.OrderItems.FirstOrDefault(s => s.Sku == stockItem.Sku);
                 stockItem.IncreaseBalance(orderItem.Quantity);
-                await _applicationContext.SaveChangesAsync();
             }
+        }
 
-            return true;
+        private async Task RollbackOrderReservePart(Order order)
+        {
+            foreach (var orderItem in order.OrderItems)
+            {
+                var reserveItem = await _applicationContext.ReservedItems.FirstOrDefaultAsync(s => s.Sku == orderItem.Sku);
+                reserveItem.ReduceBalance(orderItem.Quantity);
+            }
         }
     }
 }
