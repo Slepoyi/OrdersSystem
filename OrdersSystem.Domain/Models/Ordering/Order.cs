@@ -21,10 +21,12 @@ namespace OrdersSystem.Domain.Models.Ordering
         public Guid Id { get; private set; }
         [Required]
         public Customer Customer { get; private set; }
+        public Guid CustomerGuid { get; set; }
         public DateTime OpenTime { get; private set; }
-        public List<OrderItem> OrderItems { get; private set; }
+        public ICollection<OrderItem> OrderItems { get; private set; }
         public DateTime PickingStartTime { get; set; }
         public DateTime CloseTime { get; set; }
+        public Guid OrderPickerGuid { get; set; }
         public OrderPicker? OrderPicker { get; set; }
         public OrderStatus OrderStatus { get; set; }
 
@@ -49,7 +51,7 @@ namespace OrdersSystem.Domain.Models.Ordering
             if (currentItem.Quantity <= quantity)
                 OrderItems.Remove(currentItem);
             else
-                currentItem.Quantity -= quantity;
+                currentItem.ReduceQuantity(quantity);
 
             return true;
         }
@@ -61,7 +63,7 @@ namespace OrdersSystem.Domain.Models.Ordering
             if (currentItem is null)
                 OrderItems.Add(item);
             else
-                currentItem.Quantity += quantity;
+                currentItem.IncreaseQuantity(quantity);
         }
     }
 }

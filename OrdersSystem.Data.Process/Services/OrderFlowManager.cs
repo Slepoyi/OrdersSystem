@@ -120,7 +120,7 @@ namespace OrdersSystem.Data.Process.Services
                 var reserveItem = await _applicationContext.ReservedItems.FirstOrDefaultAsync(s => s.Sku == orderItem.Sku);
                 stockItem.ReduceBalance(orderItem.Quantity);
                 if (reserveItem is null)
-                    await _applicationContext.ReservedItems.AddAsync(new StockItem(orderItem.Sku, orderItem.Quantity));
+                    await _applicationContext.ReservedItems.AddAsync(new StockItem(orderItem.Sku, orderItem.Quantity, orderItem.SkuId));
                 else
                     reserveItem.IncreaseBalance(orderItem.Quantity);
             }

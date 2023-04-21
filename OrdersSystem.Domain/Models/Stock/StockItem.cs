@@ -5,9 +5,10 @@ namespace OrdersSystem.Domain.Models.Stock
 {
     public class StockItem
     {
-        public StockItem(Sku sku, uint stockBalance) : this(stockBalance)
+        public StockItem(Sku sku, uint stockBalance, Guid skuId) : this(stockBalance)
         {
             Sku = sku;
+            SkuId = skuId;
         }
 
         private StockItem(uint stockBalance) : base()
@@ -15,21 +16,22 @@ namespace OrdersSystem.Domain.Models.Stock
             StockBalance = stockBalance;
         }
 
-        [Key]
         public Sku Sku { get; private set; }
+        [Key]
+        public Guid SkuId { get; private set; }
         [Required]
         public uint StockBalance { get; private set; }
 
-        public void ReduceBalance(uint amount)
+        public void ReduceBalance(uint quantity)
         {
-            if (StockBalance < amount) { }
+            if (StockBalance < quantity) { }
 
-            StockBalance -= amount;
+            StockBalance -= quantity;
         }
 
-        public void IncreaseBalance(uint amount)
+        public void IncreaseBalance(uint quantity)
         {
-            StockBalance += amount;
+            StockBalance += quantity;
         }
     }
 }
