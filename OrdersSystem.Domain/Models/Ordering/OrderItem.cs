@@ -1,10 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using OrdersSystem.Domain.Models.Stock;
+﻿using OrdersSystem.Domain.Models.Stock;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OrdersSystem.Domain.Models.Ordering
 {
-    [Owned]
     public class OrderItem
     {
         public OrderItem(Sku sku, uint quantity) : this(quantity)
@@ -17,8 +16,12 @@ namespace OrdersSystem.Domain.Models.Ordering
             Quantity = quantity;
         }
 
-        public Guid SkuId { get; private set; }
-        public Sku Sku { get; private set; }
+        [Key]
+        public Guid Id { get; set; }
+
+        [ForeignKey("SkuId")]
+        public virtual Sku Sku { get; set; }
+
         [Required]
         public uint Quantity { get; private set; }
 

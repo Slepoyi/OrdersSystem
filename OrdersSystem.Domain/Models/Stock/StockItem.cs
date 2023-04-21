@@ -1,14 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OrdersSystem.Domain.Models.Stock
 {
     public class StockItem
     {
-        public StockItem(Sku sku, uint stockBalance, Guid skuId) : this(stockBalance)
+        public StockItem(Sku sku, uint stockBalance) : this(stockBalance)
         {
             Sku = sku;
-            SkuId = skuId;
         }
 
         private StockItem(uint stockBalance) : base()
@@ -16,9 +15,9 @@ namespace OrdersSystem.Domain.Models.Stock
             StockBalance = stockBalance;
         }
 
-        public Sku Sku { get; private set; }
-        [Key]
-        public Guid SkuId { get; private set; }
+        [Key, ForeignKey(nameof(Sku))]
+        public Guid Id { get; set; }
+        public virtual Sku Sku { get; set; }
         [Required]
         public uint StockBalance { get; private set; }
 
