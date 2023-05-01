@@ -1,11 +1,22 @@
-﻿using Bogus;
-using OrdersSystem.Domain.Models.Ordering;
+﻿using OrdersSystem.Data.Access.SeedData;
+using System.Text.Json;
 
-Console.WriteLine("Hello, World!");
+DataGenerator.InitData();
 
-var customerFaker = new Faker<Customer>()
-    .RuleFor(c => c.Id, Guid.NewGuid())
-    .RuleFor(c => c.Name, (f, c) => f.Name.FullName())
-    .RuleFor(c => c.Email, (f, c) => f.Internet.Email())
-    .RuleFor(c => c.Address, (f, c) => f.Address.StreetAddress(false))
-    .RuleFor(c => c.Phone, (f, c) => f.Phone.PhoneNumber("###-###-####")); // add orders
+foreach (var u in DataGenerator.Users) Print(u);
+Console.WriteLine("_________________________________________________________________");
+foreach (var c in DataGenerator.Customers) Print(c);
+Console.WriteLine("_________________________________________________________________");
+foreach (var s in DataGenerator.Skus) Print(s);
+Console.WriteLine("_________________________________________________________________");
+foreach (var op in DataGenerator.OrderPickers) Print(op);
+Console.WriteLine("_________________________________________________________________");
+foreach (var o in DataGenerator.Orders) Print(o);
+Console.WriteLine("_________________________________________________________________");
+foreach (var si in DataGenerator.StockItems) Print(si);
+
+void Print<T>(T entity)
+{
+    var serialized = JsonSerializer.Serialize(entity);
+    Console.WriteLine(serialized);
+}
