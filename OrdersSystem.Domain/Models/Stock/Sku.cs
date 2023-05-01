@@ -4,6 +4,7 @@ namespace OrdersSystem.Domain.Models.Stock
 {
     public class Sku
     {
+        public Sku() { }
         public Sku(Guid id, string name,
           string description, decimal price,
           byte[]? photo)

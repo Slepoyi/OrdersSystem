@@ -5,19 +5,21 @@ namespace OrdersSystem.Domain.Models.Stock
 {
     public class StockItem
     {
-        public StockItem(Sku sku, uint stockBalance) : this(stockBalance)
+        public StockItem() { }
+        public StockItem(Sku sku, Guid id, uint stockBalance) : this(id, stockBalance)
         {
             Sku = sku;
         }
 
-        private StockItem(uint stockBalance) : base()
+        private StockItem(Guid id, uint stockBalance) : base()
         {
+            Id = id;
             StockBalance = stockBalance;
         }
-
-        [Key, ForeignKey(nameof(Sku))]
+        [Key]
         public Guid Id { get; set; }
         public virtual Sku Sku { get; set; }
+        public Guid SkuId { get; set; }
         [Required]
         public uint StockBalance { get; private set; }
 

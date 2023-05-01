@@ -5,30 +5,31 @@ namespace OrdersSystem.Domain.Models.Ordering
 {
     public class Order
     {
-        public Order(Customer customer, DateTime openTime,
-          List<OrderItem> skus) : this(openTime)
-        {
-            Customer = customer;
-            OrderItems = skus;
-        }
-
-        private Order(DateTime openTime) : base()
+        public Order()
         {
             Id = Guid.NewGuid();
+        }
+        public Order(Customer customer, DateTime openTime,
+                 List<OrderItem> skus)
+        {
+            Customer = customer;
             OpenTime = openTime;
+            OrderItems = skus;
         }
 
         [Key]
         public Guid Id { get; private set; }
         [Required]
         [ForeignKey("CustomerId")]
-        public virtual Customer Customer { get; private set; }
-        public DateTime OpenTime { get; private set; }
+        public virtual Customer Customer { get; set; }
+        public Guid CustomerId { get; set; }
+        public DateTime OpenTime { get; set; }
         public ICollection<OrderItem> OrderItems { get; private set; } = new List<OrderItem>();
         public DateTime PickingStartTime { get; set; }
         public DateTime CloseTime { get; set; }
-        [ForeignKey("PickerId")]
+        [ForeignKey("OrderPickerId")]
         public virtual OrderPicker OrderPicker { get; set; }
+        public Guid OrderPickerId { get; set; }
         public OrderStatus OrderStatus { get; set; }
 
         public decimal GetTotalPrice()

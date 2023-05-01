@@ -6,6 +6,7 @@ namespace OrdersSystem.Domain.Models.Ordering
 {
     public class OrderItem
     {
+        public OrderItem() { }
         public OrderItem(Sku sku, uint quantity) : this(quantity)
         {
             Sku = sku;
@@ -21,9 +22,14 @@ namespace OrdersSystem.Domain.Models.Ordering
 
         [ForeignKey("SkuId")]
         public virtual Sku Sku { get; set; }
+        public Guid SkuId { get; set; }
 
         [Required]
         public uint Quantity { get; private set; }
+        [Required]
+        [ForeignKey("OrderId")]
+        public virtual Order Order { get; set; }
+        public Guid OrderId { get; set; }
 
         public void ReduceQuantity(uint quantity)
         {
