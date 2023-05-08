@@ -5,26 +5,14 @@ namespace OrdersSystem.Domain.Models.Ordering
 {
     public class Order
     {
-        public Order()
-        {
-            Id = Guid.NewGuid();
-        }
-        public Order(Customer customer, DateTime openTime,
-                 List<OrderItem> skus)
-        {
-            Customer = customer;
-            OpenTime = openTime;
-            OrderItems = skus;
-        }
-
         [Key]
-        public Guid Id { get; private set; }
+        public Guid Id { get; set; }
         [Required]
         [ForeignKey("CustomerId")]
         public virtual Customer Customer { get; set; }
         public Guid CustomerId { get; set; }
         public DateTime OpenTime { get; set; }
-        public ICollection<OrderItem> OrderItems { get; private set; } = new List<OrderItem>();
+        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
         public DateTime PickingStartTime { get; set; }
         public DateTime CloseTime { get; set; }
         [ForeignKey("OrderPickerId")]

@@ -4,26 +4,14 @@ namespace OrdersSystem.Domain.Models.Stock
 {
     public class Sku
     {
-        public Sku() { }
-        public Sku(Guid id, string name,
-          string description, decimal price,
-          byte[]? photo)
-        {
-            Id = id;
-            Name = name;
-            Description = description;
-            Price = price;
-            Photo = photo;
-        }
-
         [Key]
-        public Guid Id { get; private set; }
+        public Guid Id { get; set; }
         [Required]
-        public string Name { get; private set; }
+        public string Name { get; set; }
         [Required]
-        public string Description { get; private set; }
+        public string Description { get; set; }
         [Required]
-        public decimal Price { get; private set; }
-        public byte[]? Photo { get; private set; }
+        public decimal Price { get; set; }
+        public byte[]? Photo { get; set; }
     }
 }

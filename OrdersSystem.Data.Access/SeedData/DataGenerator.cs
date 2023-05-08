@@ -3,6 +3,7 @@ using OrdersSystem.Domain.Enums;
 using OrdersSystem.Domain.Models.Auth;
 using OrdersSystem.Domain.Models.Ordering;
 using OrdersSystem.Domain.Models.Stock;
+using System.Text;
 
 namespace OrdersSystem.Data.Access.SeedData
 {
@@ -32,16 +33,16 @@ namespace OrdersSystem.Data.Access.SeedData
 
             GetRandomSkus();
             GetRandomStockItems();
+            GetRandomUsers();
             GetRandomCustomers();
             GetRandomOrderPickers();
-            GetRandomUsers();
             GetRandomOrders();
             GetRandomOrderItems();
         }
 
         private static byte[] StringToByteArray(string str)
         {
-            var encoding = new System.Text.UTF8Encoding();
+            var encoding = new UTF8Encoding();
             return encoding.GetBytes(str);
         }
 
@@ -94,36 +95,26 @@ namespace OrdersSystem.Data.Access.SeedData
             OrderItems.AddRange(faker.Generate(_numOrderItems));
         }
 
-        private static Faker<User> UserFaker(string role, Guid? customerId, Guid? orderPickerId)
+        private static Faker<User> UserFaker(string role)
         {
             return new Faker<User>()
             .RuleFor(u => u.Id, _ => Guid.NewGuid())
             .RuleFor(u => u.Role, _ => role)
-            .RuleFor(u => u.Password, f => f.Internet.Password(8))
-            .RuleFor(u => u.CustomerId, _ => customerId)
-            .RuleFor(u => u.OrderPickerId, _ => orderPickerId);
+            .RuleFor(u => u.Password, f => f.Internet.Password(8));
         }
 
         private static void GetRandomUsers()
         {
-            var customerIds = Customers.Select(c => c.Id);
-            foreach (var id in customerIds)
-            {
-                var faker = UserFaker(UserRole.Customer, id, null);
-                Users.Add(faker.Generate());
-            }
-            var pickerIds = OrderPickers.Select(op => op.Id);
-            foreach (var id in pickerIds)
-            {
-                var faker = UserFaker(UserRole.Picker, null, id);
-                Users.Add(faker.Generate());
-            }
+            var cFaker = UserFaker(UserRole.Customer);
+            Users.AddRange(cFaker.Generate(_numCustomers));
+            var opFaker = UserFaker(UserRole.Picker);
+            Users.AddRange(opFaker.Generate(_numPickers));
         }
 
-        private static Faker<Customer> CustomerFaker()
+        private static Faker<Customer> CustomerFaker(Guid id)
         {
             return new Faker<Customer>()
-            .RuleFor(c => c.Id, _ => Guid.NewGuid())
+            .RuleFor(c => c.Id, _ => id)
             .RuleFor(c => c.Name, f => f.Name.FullName())
             .RuleFor(c => c.Email, f => f.Internet.Email())
             .RuleFor(c => c.Address, f => f.Address.StreetAddress(false))
@@ -132,21 +123,29 @@ namespace OrdersSystem.Data.Access.SeedData
 
         private static void GetRandomCustomers()
         {
-            var faker = CustomerFaker();
-            Customers.AddRange(faker.Generate(_numCustomers));
+            var userIds = Users.Where(u => u.Role == UserRole.Customer).Select(u => u.Id);
+            foreach (var id in userIds)
+            {
+                var faker = CustomerFaker(id);
+                Customers.Add(faker.Generate());
+            }
         }
 
-        private static Faker<OrderPicker> OrderPickerFaker()
+        private static Faker<OrderPicker> OrderPickerFaker(Guid id)
         {
             return new Faker<OrderPicker>()
-            .RuleFor(op => op.Id, _ => Guid.NewGuid())
+            .RuleFor(op => op.Id, _ => id)
             .RuleFor(op => op.Name, (f, op) => f.Name.FullName());
         }
 
         private static void GetRandomOrderPickers()
         {
-            var faker = OrderPickerFaker();
-            OrderPickers.AddRange(faker.Generate(_numPickers));
+            var userIds = Users.Where(u => u.Role == UserRole.Picker).Select(u => u.Id);
+            foreach (var id in userIds)
+            {
+                var faker = OrderPickerFaker(id);
+                OrderPickers.Add(faker.Generate());
+            }
         }
 
         private static Faker<Order> OrderFaker()

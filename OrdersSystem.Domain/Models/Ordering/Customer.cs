@@ -1,28 +1,23 @@
 ﻿using OrdersSystem.Domain.Enums;
-using OrdersSystem.Domain.Models.Auth;
 using System.ComponentModel.DataAnnotations;
 
 namespace OrdersSystem.Domain.Models.Ordering
 {
     public class Customer
     {
-        public Customer() { }
-
         [Key]
-        public Guid Id { get; private set; }
-        public virtual User User { get; set; }
-
+        public Guid Id { get; set; }
         [Required]
-        public string Name { get; private set; }
+        public string Name { get; set; }
         [Required]
-        public string Address { get; private set; }
+        public string Address { get; set; }
         [Required]
         [DataType(DataType.PhoneNumber)]
-        public string Phone { get; private set; }
+        public string Phone { get; set; }
         [Required]
         [DataType(DataType.EmailAddress)]
-        public string Email { get; private set; }
+        public string Email { get; set; }
         public string Role { get; } = UserRole.Customer;
-        public ICollection<Order>? Orders { get; private set; } = new List<Order>();
+        public ICollection<Order>? Orders { get; set; } = new List<Order>();
     }
 }

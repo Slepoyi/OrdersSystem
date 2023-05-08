@@ -84,7 +84,12 @@ namespace OrdersSystem.Data.Process.Services
             if (customer is null)
                 return null;
 
-            var order = new Order(customer, _clock.Now, orderItems);
+            var order = new Order
+            {
+                Customer = customer,
+                OpenTime = _clock.Now,
+                OrderItems = orderItems
+            };
 
             await ReserveOrderInDatabaseAsync(order, stockItems);
 
@@ -96,7 +101,7 @@ namespace OrdersSystem.Data.Process.Services
             if (order.OrderStatus != OrderStatus.Created)
                 return false;
 
-            await DeleteOrderReserveAsync(order);
+            DeleteOrderReserve(order);
 
             _applicationContext.Orders.Remove(order);
             await _applicationContext.SaveChangesAsync();
@@ -120,14 +125,20 @@ namespace OrdersSystem.Data.Process.Services
                 var reserveItem = await _applicationContext.ReservedItems.FirstOrDefaultAsync(s => s.Sku == orderItem.Sku);
                 stockItem.ReduceBalance(orderItem.Quantity);
                 if (reserveItem is null)
-                    await _applicationContext.ReservedItems.AddAsync(new ReserveItem(orderItem.Sku, orderItem.Sku.Id, orderItem.Quantity));
+                    await _applicationContext.ReservedItems.AddAsync(
+                        new ReserveItem 
+                        {
+                            Sku = orderItem.Sku,
+                            SkuId = orderItem.Sku.Id,
+                            StockBalance = orderItem.Quantity
+                        });
                 else
                     reserveItem.IncreaseBalance(orderItem.Quantity);
             }
             return true;
         }
 
-        private async Task DeleteOrderReserveAsync(Order order)
+        private void DeleteOrderReserve(Order order)
         {
             var stockItems = GetStockForOrderItems(order.OrderItems);
             foreach (var stockItem in stockItems)

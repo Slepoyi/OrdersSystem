@@ -6,17 +6,6 @@ namespace OrdersSystem.Domain.Models.Ordering
 {
     public class OrderItem
     {
-        public OrderItem() { }
-        public OrderItem(Sku sku, uint quantity) : this(quantity)
-        {
-            Sku = sku;
-        }
-
-        private OrderItem(uint quantity) : base()
-        {
-            Quantity = quantity;
-        }
-
         [Key]
         public Guid Id { get; set; }
 
