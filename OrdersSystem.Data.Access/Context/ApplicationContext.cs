@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OrdersSystem.Data.Access.SeedData;
 using OrdersSystem.Domain.Models.Auth;
 using OrdersSystem.Domain.Models.Ordering;
 using OrdersSystem.Domain.Models.Stock;
