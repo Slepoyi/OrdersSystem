@@ -17,7 +17,7 @@ namespace OrdersSystem.Api.Controllers
         }
 
         [HttpPost]
-        public async Task RefreshDb()
+        public void RefreshDb()
         {
             _refreshDbSet.Refresh();
         }
