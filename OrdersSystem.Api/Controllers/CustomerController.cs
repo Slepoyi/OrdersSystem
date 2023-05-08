@@ -22,8 +22,7 @@ namespace OrdersSystem.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateOrderAsync([FromBody] IEnumerable<OrderItem> orderItems)
         {
-            if (HttpContext.Items["User"] is not User user)
-                return Problem("Error creating user identity.");
+            var user = HttpContext.Items["User"] as User;
 
             var stockItems = _orderManager.GetStockForOrderItems(orderItems);
 
@@ -41,8 +40,7 @@ namespace OrdersSystem.Api.Controllers
         [HttpPost("{id}")]
         public async Task<IActionResult> CancelOrderAsync(Guid id)
         {
-            if (HttpContext.Items["User"] is not User user)
-                return Problem("Error creating user identity.");
+            var user = HttpContext.Items["User"] as User;
 
             var order = await _orderManager.GetByGuidAsync(id);
 
@@ -63,8 +61,7 @@ namespace OrdersSystem.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByGuidAsync(Guid id)
         {
-            if (HttpContext.Items["User"] is not User user)
-                return Problem("Error creating user identity.");
+            var user = HttpContext.Items["User"] as User;
 
             var order = await _orderManager.GetByGuidAsync(id);
 

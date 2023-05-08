@@ -19,11 +19,10 @@ namespace OrdersSystem.Api.Controllers
             _orderManager = orderManager;
         }
 
-        [HttpPost]
+        [HttpPost("confirm/")]
         public async Task<IActionResult> ConfirmOrderPicking([FromBody] Order order)
         {
-            if (HttpContext.Items["User"] is not User user)
-                return Problem("Error creating user identity.");
+            var user = HttpContext.Items["User"] as User;
 
             var stockItems = _orderManager.GetStockForOrderItems(order.OrderItems);
 
@@ -41,11 +40,10 @@ namespace OrdersSystem.Api.Controllers
             // find difference between final order and reserve and rollback stock of the difference
         }
 
-        [HttpPost]
+        [HttpPost("assign/")]
         public async Task<IActionResult> AssignOrderAsync()
         {
-            if (HttpContext.Items["User"] is not User user)
-                return Problem("Error creating user identity.");
+            var user = HttpContext.Items["User"] as User;
 
             var order = await _orderManager.GetNextOrderAsync();
             if (order is null)
