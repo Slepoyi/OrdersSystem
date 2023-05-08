@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.IdentityModel.Tokens;
 using OrdersSystem.Domain.Models.Auth;
 
 namespace OrdersSystem.Api.Auth.Middleware
@@ -25,6 +26,9 @@ namespace OrdersSystem.Api.Auth.Middleware
                 context.Result = new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
                 return;
             }
+
+            if (_roles.IsNullOrEmpty())
+                return;
 
             if (!_roles.Contains(user.Role))
             {
