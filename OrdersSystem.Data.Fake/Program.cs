@@ -1,4 +1,4 @@
-﻿using OrdersSystem.Data.Access.SeedData;
+﻿using OrdersSystem.Data.Refresh;
 using System.Text.Json;
 
 DataGenerator.InitData();

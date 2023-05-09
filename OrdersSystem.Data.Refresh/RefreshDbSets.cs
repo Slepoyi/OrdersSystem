@@ -1,5 +1,4 @@
 ﻿using OrdersSystem.Data.Access.Context;
-using OrdersSystem.Data.Access.SeedData;
 using OrdersSystem.Domain.Models.Auth;
 using OrdersSystem.Domain.Models.Ordering;
 using OrdersSystem.Domain.Models.Stock;
