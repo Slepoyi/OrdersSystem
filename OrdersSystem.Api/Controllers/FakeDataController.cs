@@ -4,7 +4,7 @@ using OrdersSystem.Data.Refresh;
 
 namespace OrdersSystem.Api.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/data/")]
     [ApiController]
     public class FakeDataController : ControllerBase
