@@ -44,6 +44,11 @@ namespace OrdersSystem.Data.Process.Services
             return stock;
         }
 
+        public IEnumerable<StockItem> GetStock()
+        {
+            return _applicationContext.StockItems.AsEnumerable();
+        }
+
         public Task<Order?> GetNextOrderAsync()
         {
             return _applicationContext.Orders.OrderBy(o => o.OpenTime).FirstOrDefaultAsync();

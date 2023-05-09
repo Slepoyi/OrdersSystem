@@ -73,5 +73,10 @@ namespace OrdersSystem.Api.Controllers
 
             return Ok(order);
         }
+        [HttpGet]
+        public IActionResult GetStock()
+        {
+            return Ok(_orderManager.GetStock());
+        }
     }
 }

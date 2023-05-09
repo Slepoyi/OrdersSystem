@@ -8,6 +8,7 @@ namespace OrdersSystem.Data.Process.Services
     {
         ValidationResult ValidateOrder(IEnumerable<OrderItem> orderItems, IEnumerable<StockItem> stockItems);
         IEnumerable<StockItem> GetStockForOrderItems(IEnumerable<OrderItem> orderItems);
+        IEnumerable<StockItem> GetStock();
         Task<Order?> GetByGuidAsync(Guid id);
         Task<Order?> CreateOrderAsync(List<OrderItem> orderItems, Guid userGuid, IEnumerable<StockItem> stockItems);
         Task<bool> CancelOrderAsync(Order order);
