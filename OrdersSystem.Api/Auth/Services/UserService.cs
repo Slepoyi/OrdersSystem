@@ -6,40 +6,35 @@ namespace OrdersSystem.Api.Auth.Services
 {
     public class UserService : IUserService
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICryptoProvider _cryptoProvider;
         private readonly ApplicationContext _applicationContext;
 
-        public UserService(IHttpContextAccessor httpContextAccessor, ICryptoProvider cryptoProvider,
-            ApplicationContext applicationContext)
+        public UserService(ICryptoProvider cryptoProvider, ApplicationContext applicationContext)
         {
-            _httpContextAccessor = httpContextAccessor;
             _cryptoProvider = cryptoProvider;
             _applicationContext = applicationContext;
         }
 
-        public User? GetCurrentAuthenticatedUser()
-            => _httpContextAccessor.HttpContext?.Items["User"] as User;
-
-        public async Task<User?> GetByIdConsideringPasswordAsync(Guid id, string password)
+        public async Task<User?> GetByUsernameConsideringPasswordAsync(LoginModel loginModel)
         {
-            var user = await GetByIdAsync(id);
+            var user = await GetByUsernameAsync(loginModel.Username);
 
-            if (!CheckPasswordHash(user, password))
+            if (!CheckPasswordHash(user?.Password, loginModel.Password))
                 return null;
 
             return user;
         }
 
-        public async Task<User?> GetByIdAsync(Guid id)
-            => await _applicationContext.Users.FindAsync(id);
+        public async Task<User?> GetByUsernameAsync(string username)
+            => await _applicationContext.Users.FindAsync(username);
 
-        private bool CheckPasswordHash(User? user, string password)
+        private bool CheckPasswordHash(string? passwordHash, string password)
         {
-            if (user is null)
+            if (passwordHash is null)
                 return false;
 
-            return user.Password == _cryptoProvider.CreateCryptoString(password);
+            return passwordHash == password;
+            //return user.Password == _cryptoProvider.CreateCryptoString(password);
         }
     }
 }

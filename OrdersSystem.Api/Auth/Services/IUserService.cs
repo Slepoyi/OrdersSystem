@@ -4,10 +4,8 @@ namespace OrdersSystem.Api.Auth.Services
 {
     public interface IUserService
     {
-        public User? GetCurrentAuthenticatedUser();
+        Task<User?> GetByUsernameConsideringPasswordAsync(LoginModel loginModel);
 
-        Task<User?> GetByIdConsideringPasswordAsync(Guid id, string password);
-
-        Task<User?> GetByIdAsync(Guid id);
+        Task<User?> GetByUsernameAsync(string username);
     }
 }

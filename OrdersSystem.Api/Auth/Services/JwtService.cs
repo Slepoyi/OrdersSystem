@@ -26,6 +26,7 @@ namespace OrdersSystem.Api.Auth.Services
                     new Claim[]
                     {
                         new Claim("id", user.Id.ToString()),
+                        new Claim("username", user.Username),
                         new Claim("role", user.Role)
                     }),
                 Audience = _jwtOptions.ValidAudience,
@@ -37,7 +38,7 @@ namespace OrdersSystem.Api.Auth.Services
             return tokenHandler.WriteToken(token);
         }
 
-        public Guid? ValidateTokenAndExtractId(string? token)
+        public string? ValidateTokenAndExtractUsername(string? token)
         {
             if (token is null)
                 return null;
@@ -61,7 +62,7 @@ namespace OrdersSystem.Api.Auth.Services
 
                 var jwtToken = (JwtSecurityToken)validatedToken;
 
-                return Guid.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
+                return jwtToken.Claims.FirstOrDefault(x => x.Type == "username")?.Value;
             }
             catch
             {

@@ -1,16 +1,11 @@
-﻿using OrdersSystem.Domain.Models.Ordering;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace OrdersSystem.Domain.Models.Auth
 {
-    public class User
+    public class LoginModel
     {
-        [Key]
-        public Guid Id { get; set; }
         [Required]
         public string Username { get; set; }
-        [Required]
-        public string Role { get; set; }
         [Required]
         [DataType(DataType.Password)]
         [StringLength(8)]

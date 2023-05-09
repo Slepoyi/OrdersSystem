@@ -6,6 +6,6 @@ namespace OrdersSystem.Api.Auth.Services
     {
         string GenerateToken(User user);
 
-        Guid? ValidateTokenAndExtractId(string? token);
+        string? ValidateTokenAndExtractUsername(string? token);
     }
 }
