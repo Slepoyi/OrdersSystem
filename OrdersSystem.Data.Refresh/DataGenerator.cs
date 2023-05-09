@@ -5,7 +5,7 @@ using OrdersSystem.Domain.Models.Ordering;
 using OrdersSystem.Domain.Models.Stock;
 using System.Text;
 
-namespace OrdersSystem.Data.Access.SeedData
+namespace OrdersSystem.Data.Refresh
 {
     public class DataGenerator
     {
@@ -99,6 +99,7 @@ namespace OrdersSystem.Data.Access.SeedData
         {
             return new Faker<User>()
             .RuleFor(u => u.Id, _ => Guid.NewGuid())
+            .RuleFor(u => u.Username, f => f.Internet.UserName())
             .RuleFor(u => u.Role, _ => role)
             .RuleFor(u => u.Password, f => f.Internet.Password(8));
         }
