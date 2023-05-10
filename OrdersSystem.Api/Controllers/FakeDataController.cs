@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OrdersSystem.Api.Auth.Middleware;
-using OrdersSystem.Data.Refresh;
+using OrdersSystem.Data.Process.DataRefresh;
 
 namespace OrdersSystem.Api.Controllers
 {
@@ -9,17 +9,17 @@ namespace OrdersSystem.Api.Controllers
     [ApiController]
     public class FakeDataController : ControllerBase
     {
-        private readonly IRefreshDbSets _refreshDbSet;
+        private readonly IDbSetsRefresher _dbSetsRefresher;
 
-        public FakeDataController(IRefreshDbSets refreshDbSet)
+        public FakeDataController(IDbSetsRefresher dbSetsRefresher)
         {
-            _refreshDbSet = refreshDbSet;
+            _dbSetsRefresher = dbSetsRefresher;
         }
 
         [HttpPost]
         public void RefreshDb()
         {
-            _refreshDbSet.Refresh();
+            _dbSetsRefresher.Refresh();
         }
     }
 }

@@ -3,20 +3,21 @@ using OrdersSystem.Domain.Models.Auth;
 using OrdersSystem.Domain.Models.Ordering;
 using OrdersSystem.Domain.Models.Stock;
 
-namespace OrdersSystem.Data.Refresh
+namespace OrdersSystem.Data.Process.DataRefresh
 {
-    public class RefreshDbSets : IRefreshDbSets
+    public class DbSetsRefresher : IDbSetsRefresher
     {
         private readonly ApplicationContext _applicationContext;
+        private readonly IDataGenerator _dataGenerator;
 
-        public RefreshDbSets(ApplicationContext applicationContext)
+        public DbSetsRefresher(ApplicationContext applicationContext, IDataGenerator dataGenerator)
         {
             _applicationContext = applicationContext;
+            _dataGenerator = dataGenerator;
         }
 
         public void Refresh()
         {
-
             ClearEntityDbSet<User>();
             ClearEntityDbSet<Customer>();
             ClearEntityDbSet<OrderPicker>();
@@ -25,14 +26,14 @@ namespace OrdersSystem.Data.Refresh
             ClearEntityDbSet<ReserveItem>();
             ClearEntityDbSet<Sku>();
 
-            DataGenerator.InitData();
+            _dataGenerator.InitData();
 
-            SeedEntity(DataGenerator.Users);
-            SeedEntity(DataGenerator.Skus);
-            SeedEntity(DataGenerator.StockItems);
-            SeedEntity(DataGenerator.Customers);
-            SeedEntity(DataGenerator.OrderPickers);
-            SeedEntity(DataGenerator.Orders);
+            SeedEntity(_dataGenerator.Users);
+            SeedEntity(_dataGenerator.Skus);
+            SeedEntity(_dataGenerator.StockItems);
+            SeedEntity(_dataGenerator.Customers);
+            SeedEntity(_dataGenerator.OrderPickers);
+            SeedEntity(_dataGenerator.Orders);
         }
 
         private void ClearEntityDbSet<T>() where T : class, new()

@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OrdersSystem.Data.Process\OrdersSystem.Data.Process.csproj" />
-    <ProjectReference Include="..\OrdersSystem.Data.Refresh\OrdersSystem.Data.Refresh.csproj" />
     <ProjectReference Include="..\OrdersSystem.Domain\OrdersSystem.Domain.csproj" />
   </ItemGroup>
 
