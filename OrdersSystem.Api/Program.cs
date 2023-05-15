@@ -1,4 +1,7 @@
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.IISIntegration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using OrdersSystem.Api.Auth.Middleware;
 using OrdersSystem.Api.Auth.Services;
 using OrdersSystem.Api.Options;
@@ -14,7 +17,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Ordering system", Version = "v1" });
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Ordering system.xml"));
+});
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<ApplicationContext>(options =>

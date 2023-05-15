@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OrdersSystem.Api</name>
+    </assembly>
+    <members>
+        <member name="M:OrdersSystem.Api.Controllers.AuthenticationController.Authenticate(OrdersSystem.Domain.Models.Auth.LoginModel)">
+            <summary>
+            Generates a jwt token for provided loginModel
+            </summary>
+            <param name="loginModel"></param>
+            <returns>A newly generated jwt token</returns>
+            <response code="200">Returns the newly generated token</response>
+            <response code="400">If loginModel is invalid</response>
+        </member>
+        <member name="M:OrdersSystem.Api.Controllers.CustomerController.CreateOrderAsync(System.Collections.Generic.IEnumerable{OrdersSystem.Domain.Models.Ordering.OrderItem})">
+            <summary>
+            Creates an Order
+            </summary>
+            <param name="orderItems"></param>
+            <returns>A newly generated jwt token</returns>
+            <response code="201">Returns the newly created order</response>
+            <response code="400">If any of orderItems is invalid</response>
+        </member>
+        <member name="M:OrdersSystem.Api.Controllers.CustomerController.CancelOrderAsync(System.Guid)">
+            <summary>
+            Cancels an Order
+            </summary>
+            <param name="id"></param>
+            <returns>Confirmation that order was cancelled</returns>
+            <response code="200">Order was cancelled</response>
+            <response code="403">Order does not belong to the customer</response>
+            <response code="404">Order with such an id does not exist</response>
+            <response code="501">Order was processed and cannot be cancelled</response>
+        </member>
+        <member name="M:OrdersSystem.Api.Controllers.CustomerController.GetByGuidAsync(System.Guid)">
+            <summary>
+            Retrieve information about an Order
+            </summary>
+            <param name="id"></param>
+            <returns>Order entity</returns>
+            <response code="200">Returns an Order entity</response>
+            <response code="403">Order does not belong to the customer</response>
+            <response code="404">Order with such an id does not exist</response>
+        </member>
+        <member name="M:OrdersSystem.Api.Controllers.CustomerController.GetStock">
+            <summary>
+            Retrieve information about the stock
+            </summary>
+            <param name=""></param>
+            <returns>Collection of StockItems</returns>
+            <response code="200">Returns a collection of Stockitems</response>
+        </member>
+        <member name="M:OrdersSystem.Api.Controllers.FakeDataController.RefreshDb">
+            <summary>
+            Refreshes all the DbSets with randomly generated information
+            </summary>
+            <param name=""></param>
+            <returns>Ok</returns>
+            <response code="200">Returns confirmation of DbSets refreshing</response>
+        </member>
+        <member name="M:OrdersSystem.Api.Controllers.OrderPickerController.ConfirmOrderPicking(OrdersSystem.Domain.Models.Ordering.Order)">
+            <summary>
+            Confirms that order picking has started
+            </summary>
+            <param name="order"></param>
+            <returns>Confirmation that order was succesfully updated</returns>
+            <response code="200">Order was succesfully updated</response>
+            <response code="400">Order data is invalid</response>
+        </member>
+        <member name="M:OrdersSystem.Api.Controllers.OrderPickerController.AssignOrderAsync">
+            <summary>
+            Assign an order to the OrderPicker
+            </summary>
+            <param name=""></param>
+            <returns>Confirmation that order was assigned</returns>
+            <response code="200">Order was assigned to the OrderPicker</response>\
+            <response code="404">There is no any Order which can be assigned</response>
+            <response code="500">Internal error finding the OrderPicker in the database</response>
+        </member>
+    </members>
+</doc>
