@@ -7,9 +7,10 @@ using OrdersSystem.Domain.Models.Ordering;
 
 namespace OrdersSystem.Api.Controllers
 {
-    [Authorize(UserRole.Picker)]
-    [Route("api/pickers/")]
     [ApiController]
+    [Route("api/pickers/")]
+    [Produces("application/json")]
+    [Authorize(UserRole.Picker)]
     public class OrderPickerController : ControllerBase
     {
         private readonly IOrderFlowManager _orderManager;
@@ -19,7 +20,16 @@ namespace OrdersSystem.Api.Controllers
             _orderManager = orderManager;
         }
 
+        /// <summary>
+        /// Confirms that order picking has started
+        /// </summary>
+        /// <param name="order"></param>
+        /// <returns>Confirmation that order was succesfully updated</returns>
+        /// <response code="200">Order was succesfully updated</response>
+        /// <response code="400">Order data is invalid</response>
         [HttpPost("confirm/")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ConfirmOrderPicking([FromBody] Order order)
         {
             var user = HttpContext.Items["User"] as User;
@@ -36,11 +46,20 @@ namespace OrdersSystem.Api.Controllers
                 return BadRequest("Sorry, there is something wrong with your order data.");
 
             return Ok("Order was successfully closed.");
-            // close order, assign ordersku to order skus list and change status of an order
-            // find difference between final order and reserve and rollback stock of the difference
         }
 
+        /// <summary>
+        /// Assign an order to the OrderPicker
+        /// </summary>
+        /// <param name=""></param>
+        /// <returns>Confirmation that order was assigned</returns>
+        /// <response code="200">Order was assigned to the OrderPicker</response>\
+        /// <response code="404">There is no any Order which can be assigned</response>
+        /// <response code="500">Internal error finding the OrderPicker in the database</response>
         [HttpPost("assign/")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> AssignOrderAsync()
         {
             var user = HttpContext.Items["User"] as User;

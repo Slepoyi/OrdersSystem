@@ -4,8 +4,9 @@ using OrdersSystem.Domain.Models.Auth;
 
 namespace OrdersSystem.Api.Controllers
 {
-    [Route("api/auth/")]
     [ApiController]
+    [Route("api/auth/")]
+    [Produces("application/json")]
     public class AuthenticationController : ControllerBase
     {
         private readonly IJwtService _jwtService;
@@ -17,7 +18,16 @@ namespace OrdersSystem.Api.Controllers
             _userService = userService;
         }
 
+        /// <summary>
+        /// Generates a jwt token for provided loginModel
+        /// </summary>
+        /// <param name="loginModel"></param>
+        /// <returns>A newly generated jwt token</returns>
+        /// <response code="200">Returns the newly generated token</response>
+        /// <response code="400">If loginModel is invalid</response>
         [HttpPost("authenticate/")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Authenticate([FromBody] LoginModel loginModel)
         {
             if (!ModelState.IsValid)
