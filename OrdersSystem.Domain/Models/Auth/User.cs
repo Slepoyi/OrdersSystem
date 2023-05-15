@@ -5,9 +5,9 @@ namespace OrdersSystem.Domain.Models.Auth
 {
     public class User
     {
-        [Key]
-        public Guid Id { get; set; }
         [Required]
+        public Guid Id { get; set; }
+        [Key]
         public string Username { get; set; }
         [Required]
         public string Role { get; set; }
