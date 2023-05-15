@@ -1,5 +1,5 @@
-﻿using OrdersSystem.Domain.Models.Ordering;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace OrdersSystem.Domain.Models.Auth
 {
@@ -14,6 +14,7 @@ namespace OrdersSystem.Domain.Models.Auth
         [Required]
         [DataType(DataType.Password)]
         [StringLength(8)]
+        [JsonIgnore]
         public string Password { get; set; }
     }
 }

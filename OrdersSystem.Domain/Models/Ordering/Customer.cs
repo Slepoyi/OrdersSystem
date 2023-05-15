@@ -1,5 +1,6 @@
 ﻿using OrdersSystem.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace OrdersSystem.Domain.Models.Ordering
 {
@@ -18,6 +19,7 @@ namespace OrdersSystem.Domain.Models.Ordering
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
         public string Role { get; } = UserRole.Customer;
+        [JsonIgnore]
         public ICollection<Order>? Orders { get; set; } = new List<Order>();
     }
 }
