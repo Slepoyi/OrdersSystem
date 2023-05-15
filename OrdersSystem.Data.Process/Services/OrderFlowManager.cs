@@ -30,6 +30,7 @@ namespace OrdersSystem.Data.Process.Services
             return await _applicationContext.Orders
                 .Include(o => o.Customer)
                 .Include(o => o.OrderPicker)
+                .Include(o => o.OrderItems)
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
 
