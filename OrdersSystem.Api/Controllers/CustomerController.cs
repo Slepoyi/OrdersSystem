@@ -4,6 +4,7 @@ using OrdersSystem.Data.Process.Services;
 using OrdersSystem.Domain.Enums;
 using OrdersSystem.Domain.Models.Auth;
 using OrdersSystem.Domain.Models.Ordering;
+using OrdersSystem.Domain.Models.Stock;
 
 namespace OrdersSystem.Api.Controllers
 {
@@ -56,7 +57,7 @@ namespace OrdersSystem.Api.Controllers
         /// <response code="403">Order does not belong to the customer</response>
         /// <response code="404">Order with such an id does not exist</response>
         /// <response code="501">Order was processed and cannot be cancelled</response>
-        [HttpPost("{id}")]
+        [HttpPost("cancel_order/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -71,12 +72,12 @@ namespace OrdersSystem.Api.Controllers
                 return NotFound();
 
             if (order.Customer.Id != user.Id)
-                return Forbid("You cannot cancel this order.");
+                return Problem(detail: "You cannot track this order.", statusCode: StatusCodes.Status403Forbidden);
 
             var cancelled = await _orderManager.CancelOrderAsync(order);
 
             if (!cancelled)
-                return Problem(detail: "Sorry, your order cannot be cancelled.", statusCode: 501);
+                return Problem(detail: "Sorry, your order cannot be cancelled.", statusCode: StatusCodes.Status501NotImplemented);
 
             return Ok("Order was cancelled");
         }
@@ -89,8 +90,8 @@ namespace OrdersSystem.Api.Controllers
         /// <response code="200">Returns an Order entity</response>
         /// <response code="403">Order does not belong to the customer</response>
         /// <response code="404">Order with such an id does not exist</response>
-        [HttpGet("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpGet("get_order/{id}")]
+        [ProducesResponseType(typeof(Order), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetByGuidAsync(Guid id)
@@ -103,7 +104,7 @@ namespace OrdersSystem.Api.Controllers
                 return NotFound();
 
             if (order.Customer.Id != user.Id)
-                return Forbid("You cannot track this order.");
+                return Problem(detail: "You cannot track this order.", statusCode: StatusCodes.Status403Forbidden);
 
             return Ok(order);
         }
@@ -114,8 +115,8 @@ namespace OrdersSystem.Api.Controllers
         /// <param name=""></param>
         /// <returns>Collection of StockItems</returns>
         /// <response code="200">Returns a collection of Stockitems</response>
-        [HttpGet("stock/")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpGet("get_stock/")]
+        [ProducesResponseType(typeof(IEnumerable<StockItem>), StatusCodes.Status200OK)]
         public IActionResult GetStock()
         {
             return Ok(_orderManager.GetStock());
