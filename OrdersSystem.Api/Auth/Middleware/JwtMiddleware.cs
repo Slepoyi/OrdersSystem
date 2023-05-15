@@ -16,10 +16,8 @@ namespace OrdersSystem.Api.Auth.Middleware
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
             var username = jwtService.ValidateTokenAndExtractUsername(token);
-            if (username is null)
-                return;
-
-            context.Items["User"] = await userService.GetByUsernameAsync(username);
+            if (username is not null)
+                context.Items["User"] = await userService.GetByUsernameAsync(username);            
 
             await _next(context);
         }
