@@ -4,6 +4,7 @@ using OrdersSystem.Api.Options;
 using OrdersSystem.Domain.Models.Auth;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 
 namespace OrdersSystem.Api.Auth.Services
 {
@@ -18,8 +19,8 @@ namespace OrdersSystem.Api.Auth.Services
         public string GenerateToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Convert.FromBase64String(_jwtOptions.Secret);
-            //var key = Encoding.ASCII.GetBytes(_jwtOptions.Secret);
+            //var key = Convert.FromBase64String(_jwtOptions.Secret);
+            var key = Encoding.ASCII.GetBytes(_jwtOptions.Secret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(
@@ -44,8 +45,8 @@ namespace OrdersSystem.Api.Auth.Services
                 return null;
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Convert.FromBase64String(_jwtOptions.Secret);
-            //var key = Encoding.ASCII.GetBytes(_jwtOptions.Secret);
+            //var key = Convert.FromBase64String(_jwtOptions.Secret);
+            var key = Encoding.ASCII.GetBytes(_jwtOptions.Secret);
             try
             {
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
