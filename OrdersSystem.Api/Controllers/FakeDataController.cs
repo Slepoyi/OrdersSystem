@@ -3,8 +3,8 @@ using OrdersSystem.Data.Process.DataRefresh;
 
 namespace OrdersSystem.Api.Controllers
 {
-    [Route("api/data/")]
     [ApiController]
+    [Route("api/data/")]
     public class FakeDataController : ControllerBase
     {
         private readonly IDbSetsRefresher _dbSetsRefresher;
@@ -18,11 +18,13 @@ namespace OrdersSystem.Api.Controllers
         /// Refreshes all the DbSets with randomly generated information
         /// </summary>
         /// <param name=""></param>
-        /// <returns></returns>
+        /// <returns>Ok</returns>
+        /// <response code="200">Returns confirmation of DbSets refreshing</response>
         [HttpPost("refresh/")]
-        public void RefreshDb()
+        public IActionResult RefreshDb()
         {
             _dbSetsRefresher.Refresh();
+            return Ok();
         }
     }
 }

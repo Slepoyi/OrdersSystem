@@ -25,8 +25,8 @@ namespace OrdersSystem.Api.Controllers
         /// <returns>A newly generated jwt token</returns>
         /// <response code="200">Returns the newly generated token</response>
         /// <response code="400">If loginModel is invalid</response>
-        [HttpPost("authenticate/")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpPost]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Authenticate([FromBody] LoginModel loginModel)
         {

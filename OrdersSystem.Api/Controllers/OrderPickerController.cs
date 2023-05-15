@@ -57,7 +57,7 @@ namespace OrdersSystem.Api.Controllers
         /// <response code="404">There is no any Order which can be assigned</response>
         /// <response code="500">Internal error finding the OrderPicker in the database</response>
         [HttpPost("assign/")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Order), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> AssignOrderAsync()
