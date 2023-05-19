@@ -3,6 +3,7 @@ using OrdersSystem.Api.Auth.Middleware;
 using OrdersSystem.Data.Process.Services;
 using OrdersSystem.Domain.Enums;
 using OrdersSystem.Domain.Models.Auth;
+using OrdersSystem.Domain.Models.Extensions;
 using OrdersSystem.Domain.Models.Ordering;
 using OrdersSystem.Domain.Models.Stock;
 
@@ -25,10 +26,10 @@ namespace OrdersSystem.Api.Controllers
         /// Creates an Order
         /// </summary>
         /// <param name="orderItems"></param>
-        /// <returns>A newly generated jwt token</returns>
+        /// <returns>A newly generated order</returns>
         /// <response code="201">Returns the newly created order</response>
-        /// <response code="400">If any of orderItems is invalid</response>
-        [HttpPost]
+        /// <response code="400">If any of StockItems is invalid</response>
+        [HttpPost("create_order/")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateOrderAsync([FromBody] IEnumerable<OrderItem> orderItems)
@@ -106,13 +107,12 @@ namespace OrdersSystem.Api.Controllers
             if (order.Customer.Id != user.Id)
                 return Problem(detail: "You cannot track this order.", statusCode: StatusCodes.Status403Forbidden);
 
-            return Ok(order);
+            return Ok(order.ToOrderDto());
         }
 
         /// <summary>
         /// Retrieve information about the stock
         /// </summary>
-        /// <param name=""></param>
         /// <returns>Collection of StockItems</returns>
         /// <response code="200">Returns a collection of Stockitems</response>
         [HttpGet("get_stock/")]
