@@ -37,17 +37,19 @@ namespace OrdersSystem.Data.Process.Services
         public IEnumerable<StockItem> GetStockForOrderItems(IEnumerable<OrderItem> orderItems)
         {
             var stock = _applicationContext.StockItems
-               .Join(orderItems,
-               s => s.Sku,
-               o => o.Sku,
-               (s, o) => s);
+                .AsEnumerable()
+                .Join(orderItems,
+                s => s.SkuId,
+                o => o.SkuId,
+                (s, _) => s)
+                .ToList();
 
             return stock;
         }
 
         public IEnumerable<StockItem> GetStock()
         {
-            return _applicationContext.StockItems.AsEnumerable();
+            return _applicationContext.StockItems.Include(s => s.Sku).AsEnumerable();
         }
 
         public Task<Order?> GetNextOrderAsync()
@@ -96,6 +98,10 @@ namespace OrdersSystem.Data.Process.Services
                 OpenTime = _clock.Now,
                 OrderItems = orderItems
             };
+            foreach (var item in order.OrderItems)
+            {
+                item.OrderId = order.Id;
+            }
 
             await ReserveOrderInDatabaseAsync(order, stockItems);
 
@@ -117,6 +123,7 @@ namespace OrdersSystem.Data.Process.Services
         private async Task<bool> ReserveOrderInDatabaseAsync(Order order, IEnumerable<StockItem> stockItems)
         {
             await _applicationContext.Orders.AddAsync(order);
+            await _applicationContext.OrderItems.AddRangeAsync(order.OrderItems);
             await AddOrderReserveAsync(order, stockItems);
             await _applicationContext.SaveChangesAsync();
 
@@ -127,19 +134,19 @@ namespace OrdersSystem.Data.Process.Services
         {
             foreach (var stockItem in stockItems)
             {
-                var orderItem = order.OrderItems.FirstOrDefault(s => s.Sku == stockItem.Sku);
-                var reserveItem = await _applicationContext.ReservedItems.FirstOrDefaultAsync(s => s.Sku == orderItem.Sku);
+                var orderItem = order.OrderItems.FirstOrDefault(s => s.SkuId == stockItem.SkuId);
+                var reserveItem = await _applicationContext.ReservedItems.FirstOrDefaultAsync(s => s.SkuId == orderItem.SkuId);
                 stockItem.ReduceBalance(orderItem.Quantity);
                 if (reserveItem is null)
                     await _applicationContext.ReservedItems.AddAsync(
-                        new ReserveItem 
+                        new ReserveItem
                         {
                             Sku = orderItem.Sku,
-                            SkuId = orderItem.Sku.Id,
+                            SkuId = orderItem.SkuId,
                             StockBalance = orderItem.Quantity
                         });
                 else
-                    reserveItem.IncreaseBalance(orderItem.Quantity);
+                    reserveItem.StockBalance += orderItem.Quantity;
             }
             return true;
         }
@@ -149,7 +156,7 @@ namespace OrdersSystem.Data.Process.Services
             var stockItems = GetStockForOrderItems(order.OrderItems);
             foreach (var stockItem in stockItems)
             {
-                var orderItem = order.OrderItems.FirstOrDefault(s => s.Sku == stockItem.Sku);
+                var orderItem = order.OrderItems.FirstOrDefault(s => s.SkuId == stockItem.SkuId);
                 stockItem.IncreaseBalance(orderItem.Quantity);
             }
         }
@@ -158,8 +165,8 @@ namespace OrdersSystem.Data.Process.Services
         {
             foreach (var orderItem in order.OrderItems)
             {
-                var reserveItem = await _applicationContext.ReservedItems.FirstOrDefaultAsync(s => s.Sku == orderItem.Sku);
-                reserveItem.ReduceBalance(orderItem.Quantity);
+                var reserveItem = await _applicationContext.ReservedItems.FirstOrDefaultAsync(s => s.SkuId == orderItem.SkuId);
+                reserveItem.StockBalance -= orderItem.Quantity;
             }
         }
     }
