@@ -11,7 +11,7 @@ namespace OrdersSystem.Data.Process.Validation
 
             foreach (var orderItem in order)
             {
-                var stockItem = stock.FirstOrDefault(s => s.Sku.Id == orderItem.Sku.Id);
+                var stockItem = stock.FirstOrDefault(s => s.SkuId == orderItem.SkuId);
                 ValidateOrderItem(result, orderItem, stockItem);
             }
 
@@ -23,21 +23,21 @@ namespace OrdersSystem.Data.Process.Validation
             if (stockItem is null)
             {
                 result.IsValid = false;
-                result.ErrorMessages.Add($"Sku '{orderItem.Sku.Name}' not found in stock.");
+                result.ErrorMessages.Add($"Sku '{orderItem.SkuId}' not found in stock.");
                 result.ErrorCodes.Add(OrderErrorCode.SkuIdNotFound);
             }
-            else if (stockItem.StockBalance < orderItem.Quantity)
+            else if (stockItem.Quantity < orderItem.Quantity)
             {
                 result.IsValid = false;
                 result.ErrorMessages.Add($"Insufficient stock for sku '{orderItem.Sku.Name}'.");
                 result.ErrorCodes.Add(OrderErrorCode.InsufficientSkuStock);
             }
-            else if (stockItem.Sku.Price != orderItem.Sku.Price)
-            {
-                result.IsValid = false;
-                result.ErrorMessages.Add($"Wrong price {orderItem.Sku.Price} for '{orderItem.Sku.Name}'.");
-                result.ErrorCodes.Add(OrderErrorCode.WrongSkuPrice);
-            }
+            //else if (stockItem.Sku.Price != orderItem.Sku.Price)
+            //{
+            //    result.IsValid = false;
+            //    result.ErrorMessages.Add($"Wrong price {orderItem.Sku.Price} for '{orderItem.Sku.Name}'.");
+            //    result.ErrorCodes.Add(OrderErrorCode.WrongSkuPrice);
+            //}
         }
     }
 }
