@@ -10,18 +10,18 @@ namespace OrdersSystem.Domain.Models.Stock
         public virtual Sku Sku { get; set; }
         public Guid SkuId { get; set; }
         [Required]
-        public uint StockBalance { get; set; }
+        public uint Quantity { get; set; }
 
         public void ReduceBalance(uint quantity)
         {
-            if (StockBalance < quantity) { }
+            if (Quantity < quantity) { }
 
-            StockBalance -= quantity;
+            Quantity -= quantity;
         }
 
         public void IncreaseBalance(uint quantity)
         {
-            StockBalance += quantity;
+            Quantity += quantity;
         }
     }
 }

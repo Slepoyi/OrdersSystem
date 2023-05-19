@@ -70,7 +70,7 @@ namespace OrdersSystem.Data.Process.DataRefresh
         private Faker<StockItem> StockItemFaker(Guid skuId)
         {
             return new Faker<StockItem>()
-            .RuleFor(si => si.StockBalance, f => f.Random.UShort(1, 300))
+            .RuleFor(si => si.Quantity, f => f.Random.UShort(1, 300))
             .RuleFor(si => si.Id, Guid.NewGuid())
             .RuleFor(si => si.SkuId, _ => skuId);
         }
