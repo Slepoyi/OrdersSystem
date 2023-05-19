@@ -25,6 +25,7 @@ namespace OrdersSystem.Data.Process.DataRefresh
             ClearEntityDbSet<StockItem>();
             ClearEntityDbSet<ReserveItem>();
             ClearEntityDbSet<Sku>();
+            ClearEntityDbSet<OrderItem>();
 
             _dataGenerator.InitData();
 
@@ -34,6 +35,7 @@ namespace OrdersSystem.Data.Process.DataRefresh
             SeedEntity(_dataGenerator.Customers);
             SeedEntity(_dataGenerator.OrderPickers);
             SeedEntity(_dataGenerator.Orders);
+            SeedEntity(_dataGenerator.OrderItems);
         }
 
         private void ClearEntityDbSet<T>() where T : class, new()
