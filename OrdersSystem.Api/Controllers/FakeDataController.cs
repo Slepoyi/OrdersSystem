@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿ using Microsoft.AspNetCore.Mvc;
 using OrdersSystem.Data.Process.DataRefresh;
 
 namespace OrdersSystem.Api.Controllers
@@ -17,7 +17,6 @@ namespace OrdersSystem.Api.Controllers
         /// <summary>
         /// Refreshes all the DbSets with randomly generated information
         /// </summary>
-        /// <param name=""></param>
         /// <returns>Ok</returns>
         /// <response code="200">Returns confirmation of DbSets refreshing</response>
         [HttpPost("refresh/")]

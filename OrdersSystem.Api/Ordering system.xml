@@ -18,9 +18,9 @@
             Creates an Order
             </summary>
             <param name="orderItems"></param>
-            <returns>A newly generated jwt token</returns>
+            <returns>A newly generated order</returns>
             <response code="201">Returns the newly created order</response>
-            <response code="400">If any of orderItems is invalid</response>
+            <response code="400">If any of StockItems is invalid</response>
         </member>
         <member name="M:OrdersSystem.Api.Controllers.CustomerController.CancelOrderAsync(System.Guid)">
             <summary>
