@@ -11,6 +11,7 @@ namespace OrdersSystem.Data.Access.Context
         public DbSet<Customer> Customers { get; set; }
         public DbSet<OrderPicker> OrderPickers { get; set; }
         public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<StockItem> StockItems { get; set; }
         public DbSet<ReserveItem> ReservedItems { get; set; }
         public DbSet<Sku> Skus { get; set; }
