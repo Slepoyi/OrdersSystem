@@ -47,7 +47,6 @@
             <summary>
             Retrieve information about the stock
             </summary>
-            <param name=""></param>
             <returns>Collection of StockItems</returns>
             <response code="200">Returns a collection of Stockitems</response>
         </member>
@@ -55,11 +54,10 @@
             <summary>
             Refreshes all the DbSets with randomly generated information
             </summary>
-            <param name=""></param>
             <returns>Ok</returns>
             <response code="200">Returns confirmation of DbSets refreshing</response>
         </member>
-        <member name="M:OrdersSystem.Api.Controllers.OrderPickerController.ConfirmOrderPicking(OrdersSystem.Domain.Models.Ordering.Order)">
+        <member name="M:OrdersSystem.Api.Controllers.OrderPickerController.FinishOrder(OrdersSystem.Domain.Models.Ordering.Order)">
             <summary>
             Confirms that order picking has started
             </summary>

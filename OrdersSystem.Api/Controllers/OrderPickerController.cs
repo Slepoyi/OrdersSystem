@@ -30,7 +30,7 @@ namespace OrdersSystem.Api.Controllers
         [HttpPost("confirm/")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> ConfirmOrderPicking([FromBody] Order order)
+        public async Task<IActionResult> FinishOrder([FromBody] Order order)
         {
             var user = HttpContext.Items["User"] as User;
 
