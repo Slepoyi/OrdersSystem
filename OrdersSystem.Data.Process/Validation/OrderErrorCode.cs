@@ -2,5 +2,5 @@
 {
     SkuIdNotFound,
     InsufficientSkuStock,
-    WrongSkuPrice
+    DuplicateId
 }
