@@ -42,11 +42,11 @@ namespace OrdersSystem.Api.Controllers
             if (!validationResult.IsValid)
                 return BadRequest(validationResult.ErrorMessages);
 
-            var order = await _orderManager.CreateOrderAsync(orderItems.ToList(), user.Id, stockItems);
+            var order = await _orderManager.CreateOrderAsync(orderItems, user.Id, stockItems);
             if (order is null)
                 return BadRequest();
 
-            return CreatedAtAction(nameof(GetByGuidAsync), new { id = order.Id }, order);
+            return CreatedAtAction(nameof(GetByGuidAsync), new { id = order.Id }, order.ToOrderDto());
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace OrdersSystem.Api.Controllers
             if (order is null)
                 return NotFound();
 
-            if (order.Customer.Id != user.Id)
+            if (order.CustomerId != user.Id)
                 return Problem(detail: "You cannot track this order.", statusCode: StatusCodes.Status403Forbidden);
 
             var cancelled = await _orderManager.CancelOrderAsync(order);
@@ -104,7 +104,7 @@ namespace OrdersSystem.Api.Controllers
             if (order is null)
                 return NotFound();
 
-            if (order.Customer.Id != user.Id)
+            if (order.CustomerId != user.Id)
                 return Problem(detail: "You cannot track this order.", statusCode: StatusCodes.Status403Forbidden);
 
             return Ok(order.ToOrderDto());
