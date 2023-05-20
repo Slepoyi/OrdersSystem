@@ -4,6 +4,8 @@ using OrdersSystem.Data.Process.Validation;
 using OrdersSystem.Domain.Models.Ordering;
 using OrdersSystem.Domain.Models.Stock;
 using OrdersSystem.Domain.Time;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace OrdersSystem.Data.Process.Services
 {
@@ -54,7 +56,7 @@ namespace OrdersSystem.Data.Process.Services
 
         public Task<Order?> GetNextOrderAsync()
         {
-            return _applicationContext.Orders.OrderBy(o => o.OpenTime).FirstOrDefaultAsync();
+            return _applicationContext.Orders.OrderBy(o => o.OpenTime).FirstOrDefaultAsync(o => o.OrderStatus == OrderStatus.Created);
         }
 
         public async Task<bool> BeginOrderPickingAsync(Order order, Guid userGuid)
@@ -86,7 +88,7 @@ namespace OrdersSystem.Data.Process.Services
             return true;
         }
 
-        public async Task<Order?> CreateOrderAsync(List<OrderItem> orderItems, Guid userGuid, IEnumerable<StockItem> stockItems)
+        public async Task<Order?> CreateOrderAsync(IEnumerable<OrderItem> orderItems, Guid userGuid, IEnumerable<StockItem> stockItems)
         {
             var customer = await _applicationContext.Customers.FindAsync(userGuid);
             if (customer is null)
@@ -94,16 +96,14 @@ namespace OrdersSystem.Data.Process.Services
 
             var order = new Order
             {
-                Customer = customer,
+                Id = Guid.NewGuid(),
+                CustomerId = customer.Id,
                 OpenTime = _clock.Now,
-                OrderItems = orderItems
             };
-            foreach (var item in order.OrderItems)
-            {
+            foreach (var item in orderItems)
                 item.OrderId = order.Id;
-            }
 
-            await ReserveOrderInDatabaseAsync(order, stockItems);
+            await ReserveOrderInDatabaseAsync(order, stockItems, orderItems);
 
             return order;
         }
@@ -120,23 +120,23 @@ namespace OrdersSystem.Data.Process.Services
             return true;
         }
 
-        private async Task<bool> ReserveOrderInDatabaseAsync(Order order, IEnumerable<StockItem> stockItems)
+        private async Task<bool> ReserveOrderInDatabaseAsync(Order order, IEnumerable<StockItem> stockItems, IEnumerable<OrderItem> orderItems)
         {
             await _applicationContext.Orders.AddAsync(order);
-            await _applicationContext.OrderItems.AddRangeAsync(order.OrderItems);
-            await AddOrderReserveAsync(order, stockItems);
+            await _applicationContext.OrderItems.AddRangeAsync(orderItems);
+            await AddOrderReserveAsync(order, stockItems, orderItems);
             await _applicationContext.SaveChangesAsync();
 
             return true;
         }
 
-        private async Task<bool> AddOrderReserveAsync(Order order, IEnumerable<StockItem> stockItems)
+        private async Task<bool> AddOrderReserveAsync(Order order, IEnumerable<StockItem> stockItems, IEnumerable<OrderItem> orderItems)
         {
             foreach (var stockItem in stockItems)
             {
-                var orderItem = order.OrderItems.FirstOrDefault(s => s.SkuId == stockItem.SkuId);
+                var orderItem = orderItems.FirstOrDefault(s => s.SkuId == stockItem.SkuId);
                 var reserveItem = await _applicationContext.ReservedItems.FirstOrDefaultAsync(s => s.SkuId == orderItem.SkuId);
-                stockItem.ReduceBalance(orderItem.Quantity);
+                stockItem.Quantity -= orderItem.Quantity;
                 if (reserveItem is null)
                     await _applicationContext.ReservedItems.AddAsync(
                         new ReserveItem
@@ -157,7 +157,7 @@ namespace OrdersSystem.Data.Process.Services
             foreach (var stockItem in stockItems)
             {
                 var orderItem = order.OrderItems.FirstOrDefault(s => s.SkuId == stockItem.SkuId);
-                stockItem.IncreaseBalance(orderItem.Quantity);
+                stockItem.Quantity += orderItem.Quantity;
             }
         }
 
