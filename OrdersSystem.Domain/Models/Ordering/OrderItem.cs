@@ -1,6 +1,7 @@
 ﻿using OrdersSystem.Domain.Models.Stock;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace OrdersSystem.Domain.Models.Ordering
 {
@@ -16,6 +17,7 @@ namespace OrdersSystem.Domain.Models.Ordering
         [Required]
         public uint Quantity { get; set; }
         [ForeignKey("OrderId")]
+        [JsonIgnore]
         public virtual Order? Order { get; set; }
         public Guid OrderId { get; set; }
     }
