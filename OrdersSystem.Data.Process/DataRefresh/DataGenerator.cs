@@ -1,4 +1,5 @@
 ﻿using Bogus;
+using Bogus.DataSets;
 using Microsoft.Extensions.Options;
 using OrdersSystem.Data.Process.Options;
 using OrdersSystem.Domain.Enums;
@@ -151,6 +152,7 @@ namespace OrdersSystem.Data.Process.DataRefresh
                 var faker = OrderPickerFaker(id);
                 OrderPickers.Add(faker.Generate());
             }
+            OrderPickers.Add(new OrderPicker { Id = Guid.Empty, Name = "Mr Nobody" });
         }
 
         private Faker<Order> OrderFaker()
