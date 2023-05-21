@@ -2,5 +2,6 @@
 {
     SkuIdNotFound,
     InsufficientSkuStock,
+    ZeroQuantity,
     DuplicateId
 }

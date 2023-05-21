@@ -6,7 +6,9 @@ namespace OrdersSystem.Data.Process.Services
 {
     public interface IOrderFlowManager
     {
-        ValidationResult ValidateOrder(IEnumerable<OrderItem> orderItems, IEnumerable<StockItem> stockItems);
+        ValidationResult CustomerValidateOrder(IEnumerable<OrderItem> orderItems, IEnumerable<StockItem> stockItems);
+        ValidationResult PickerValidateOrder(IEnumerable<OrderItem> orderItems, IEnumerable<ReserveItem> reserveItems);
+        IEnumerable<ReserveItem> GetReserveForOrderItems(IEnumerable<OrderItem> orderItems);
         IEnumerable<StockItem> GetStockForOrderItems(IEnumerable<OrderItem> orderItems);
         IEnumerable<StockItem> GetStock();
         Task<Order?> GetByGuidAsync(Guid id);
@@ -14,6 +16,6 @@ namespace OrdersSystem.Data.Process.Services
         Task<bool> CancelOrderAsync(Order order);
         Task<Order?> GetNextOrderAsync();
         Task<bool> BeginOrderPickingAsync(Order order, Guid userGuid);
-        Task<bool> CloseOrder(Order order, Guid userGuid);
+        Task<bool> CloseOrder(Order order, Guid userGuid, IEnumerable<OrderItem> orderItems);
     }
 }

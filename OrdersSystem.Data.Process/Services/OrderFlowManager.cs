@@ -4,8 +4,6 @@ using OrdersSystem.Data.Process.Validation;
 using OrdersSystem.Domain.Models.Ordering;
 using OrdersSystem.Domain.Models.Stock;
 using OrdersSystem.Domain.Time;
-using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace OrdersSystem.Data.Process.Services
 {
@@ -22,9 +20,14 @@ namespace OrdersSystem.Data.Process.Services
             _clock = clock;
         }
 
-        public ValidationResult ValidateOrder(IEnumerable<OrderItem> orderItems, IEnumerable<StockItem> stockItems)
+        public ValidationResult CustomerValidateOrder(IEnumerable<OrderItem> orderItems, IEnumerable<StockItem> stockItems)
         {
-            return _orderValidator.ValidateOrder(orderItems, stockItems);
+            return _orderValidator.CustomerValidateOrder(orderItems, stockItems);
+        }
+
+        public ValidationResult PickerValidateOrder(IEnumerable<OrderItem> orderItems, IEnumerable<ReserveItem> reserveItem)
+        {
+            return _orderValidator.PickerValidateOrder(orderItems, reserveItem);
         }
 
         public async Task<Order?> GetByGuidAsync(Guid id)
@@ -38,15 +41,24 @@ namespace OrdersSystem.Data.Process.Services
 
         public IEnumerable<StockItem> GetStockForOrderItems(IEnumerable<OrderItem> orderItems)
         {
-            var stock = _applicationContext.StockItems
+            return _applicationContext.StockItems
                 .AsEnumerable()
                 .Join(orderItems,
                 s => s.SkuId,
                 o => o.SkuId,
                 (s, _) => s)
                 .ToList();
+        }
 
-            return stock;
+        public IEnumerable<ReserveItem> GetReserveForOrderItems(IEnumerable<OrderItem> orderItems)
+        {
+            return _applicationContext.ReservedItems
+                .AsEnumerable()
+                .Join(orderItems,
+                r => r.SkuId,
+                o => o.SkuId,
+                (r, _) => r)
+                .ToList();
         }
 
         public IEnumerable<StockItem> GetStock()
@@ -56,7 +68,10 @@ namespace OrdersSystem.Data.Process.Services
 
         public Task<Order?> GetNextOrderAsync()
         {
-            return _applicationContext.Orders.OrderBy(o => o.OpenTime).FirstOrDefaultAsync(o => o.OrderStatus == OrderStatus.Created);
+            return _applicationContext.Orders.
+                OrderBy(o => o.OpenTime).
+                Include(o => o.OrderItems).
+                FirstOrDefaultAsync(o => o.OrderStatus == OrderStatus.Created);
         }
 
         public async Task<bool> BeginOrderPickingAsync(Order order, Guid userGuid)
@@ -65,14 +80,14 @@ namespace OrdersSystem.Data.Process.Services
             if (picker is null)
                 return false;
 
-            order.OrderPicker = picker;
+            order.OrderPickerId = picker.Id;
             order.OrderStatus = OrderStatus.Processing;
             order.PickingStartTime = _clock.Now;
             await _applicationContext.SaveChangesAsync();
             return true;
         }
 
-        public async Task<bool> CloseOrder(Order order, Guid userGuid)
+        public async Task<bool> CloseOrder(Order order, Guid userGuid, IEnumerable<OrderItem> orderItems)
         {
             var picker = await _applicationContext.OrderPickers.FindAsync(userGuid);
             if (picker is null)
@@ -81,10 +96,17 @@ namespace OrdersSystem.Data.Process.Services
             if (order.OrderStatus != OrderStatus.Processing)
                 return false;
 
-            await RollbackOrderReservePart(order);
+            await RollbackOrderReservePartAsync(order);
+
+            foreach (var item in order.OrderItems)
+            {
+                var oi = orderItems.FirstOrDefault(i => i.Id == item.Id);
+                item.Quantity = oi.Quantity;
+            }
 
             order.OrderStatus = OrderStatus.Finished;
             order.CloseTime = _clock.Now;
+            await _applicationContext.SaveChangesAsync();
             return true;
         }
 
@@ -124,13 +146,13 @@ namespace OrdersSystem.Data.Process.Services
         {
             await _applicationContext.Orders.AddAsync(order);
             await _applicationContext.OrderItems.AddRangeAsync(orderItems);
-            await AddOrderReserveAsync(order, stockItems, orderItems);
+            await AddOrderReserveAsync(stockItems, orderItems);
             await _applicationContext.SaveChangesAsync();
 
             return true;
         }
 
-        private async Task<bool> AddOrderReserveAsync(Order order, IEnumerable<StockItem> stockItems, IEnumerable<OrderItem> orderItems)
+        private async Task<bool> AddOrderReserveAsync(IEnumerable<StockItem> stockItems, IEnumerable<OrderItem> orderItems)
         {
             foreach (var stockItem in stockItems)
             {
@@ -161,12 +183,16 @@ namespace OrdersSystem.Data.Process.Services
             }
         }
 
-        private async Task RollbackOrderReservePart(Order order)
+        private async Task RollbackOrderReservePartAsync(Order order)
         {
             foreach (var orderItem in order.OrderItems)
             {
                 var reserveItem = await _applicationContext.ReservedItems.FirstOrDefaultAsync(s => s.SkuId == orderItem.SkuId);
-                reserveItem.StockBalance -= orderItem.Quantity;
+                var balance = reserveItem.StockBalance - orderItem.Quantity;
+                if (balance == 0)
+                    _applicationContext.ReservedItems.Remove(reserveItem);
+                else
+                    reserveItem.StockBalance -= orderItem.Quantity;
             }
         }
     }
