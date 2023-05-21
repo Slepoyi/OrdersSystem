@@ -11,6 +11,7 @@ namespace OrdersSystem.Domain.Models.Ordering
         public Guid Id { get; set; }
 
         [ForeignKey("SkuId")]
+        [JsonIgnore]
         public virtual Sku? Sku { get; set; }
         public Guid SkuId { get; set; }
 
