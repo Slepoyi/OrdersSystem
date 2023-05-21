@@ -1,5 +1,4 @@
 ﻿using Bogus;
-using Bogus.DataSets;
 using Microsoft.Extensions.Options;
 using OrdersSystem.Data.Process.Options;
 using OrdersSystem.Domain.Enums;
@@ -29,6 +28,8 @@ namespace OrdersSystem.Data.Process.DataRefresh
 
         public void InitData()
         {
+            Randomizer.Seed = new Random(42069);
+
             Users = new List<User>();
             Skus = new List<Sku>();
             StockItems = new List<StockItem>();
@@ -54,7 +55,7 @@ namespace OrdersSystem.Data.Process.DataRefresh
         private Faker<Sku> SkuFaker()
         {
             return new Faker<Sku>()
-            .RuleFor(s => s.Id, _ => Guid.NewGuid())
+            .RuleFor(s => s.Id, f => f.Random.Guid())
             .RuleFor(s => s.Name, f => f.Commerce.ProductName())
             .RuleFor(s => s.Description, f => f.Commerce.ProductDescription())
             .RuleFor(s => s.Price, f => decimal.Parse(f.Commerce.Price()))
@@ -72,7 +73,7 @@ namespace OrdersSystem.Data.Process.DataRefresh
         {
             return new Faker<StockItem>()
             .RuleFor(si => si.Quantity, f => f.Random.UShort(1, 300))
-            .RuleFor(si => si.Id, Guid.NewGuid())
+            .RuleFor(si => si.Id, f => f.Random.Guid())
             .RuleFor(si => si.SkuId, _ => skuId);
         }
 
@@ -88,7 +89,7 @@ namespace OrdersSystem.Data.Process.DataRefresh
         private Faker<OrderItem> OrderItemFaker()
         {
             return new Faker<OrderItem>()
-                .RuleFor(oi => oi.Id, _ => Guid.NewGuid())
+                .RuleFor(oi => oi.Id, f => f.Random.Guid())
                 .RuleFor(oi => oi.Quantity, f => f.Random.UInt(1, 50))
                 .RuleFor(oi => oi.SkuId, f => f.PickRandom(Skus).Id)
                 .RuleFor(oi => oi.OrderId, f => f.PickRandom(Orders).Id);
@@ -103,7 +104,7 @@ namespace OrdersSystem.Data.Process.DataRefresh
         private Faker<User> UserFaker(string role)
         {
             return new Faker<User>()
-            .RuleFor(u => u.Id, _ => Guid.NewGuid())
+            .RuleFor(u => u.Id, f => f.Random.Guid())
             .RuleFor(u => u.Username, f => f.Internet.UserName())
             .RuleFor(u => u.Role, _ => role)
             .RuleFor(u => u.Password, f => f.Internet.Password(8));
@@ -158,7 +159,7 @@ namespace OrdersSystem.Data.Process.DataRefresh
         private Faker<Order> OrderFaker()
         {
             return new Faker<Order>()
-            .RuleFor(o => o.Id, _ => Guid.NewGuid())
+            .RuleFor(o => o.Id, f => f.Random.Guid())
             .RuleFor(o => o.OpenTime, f => f.Date.Past())
             .RuleFor(o => o.CloseTime, f => f.Date.Recent())
             .RuleFor(o => o.OrderStatus, _ => OrderStatus.Finished)
