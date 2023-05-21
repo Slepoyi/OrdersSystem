@@ -39,7 +39,7 @@ namespace OrdersSystem.Api.Controllers
                 return BadRequest("Cannot find user with these username and password");
 
             var token = _jwtService.GenerateToken(user);
-            return Ok(token);
+            return Ok(new { Token = token });
         }
     }
 }

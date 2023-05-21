@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using OrdersSystem.Api.Auth.Middleware;
 using OrdersSystem.Data.Process.Services;
 using OrdersSystem.Domain.Enums;
@@ -6,6 +7,7 @@ using OrdersSystem.Domain.Models.Auth;
 using OrdersSystem.Domain.Models.Extensions;
 using OrdersSystem.Domain.Models.Ordering;
 using OrdersSystem.Domain.Models.Stock;
+using System.Diagnostics;
 
 namespace OrdersSystem.Api.Controllers
 {
@@ -38,7 +40,7 @@ namespace OrdersSystem.Api.Controllers
 
             var stockItems = _orderManager.GetStockForOrderItems(orderItems);
 
-            var validationResult = _orderManager.ValidateOrder(orderItems, stockItems);
+            var validationResult = _orderManager.CustomerValidateOrder(orderItems, stockItems);
             if (!validationResult.IsValid)
                 return BadRequest(validationResult.ErrorMessages);
 
@@ -70,7 +72,7 @@ namespace OrdersSystem.Api.Controllers
             var order = await _orderManager.GetByGuidAsync(id);
 
             if (order is null)
-                return NotFound();
+                return NotFound(new { Detail = "Order with this id was not found" });
 
             if (order.CustomerId != user.Id)
                 return Problem(detail: "You cannot track this order.", statusCode: StatusCodes.Status403Forbidden);
@@ -80,7 +82,7 @@ namespace OrdersSystem.Api.Controllers
             if (!cancelled)
                 return Problem(detail: "Sorry, your order cannot be cancelled.", statusCode: StatusCodes.Status501NotImplemented);
 
-            return Ok("Order was cancelled");
+            return Ok(new { Detail = "Order was cancelled" });
         }
 
         /// <summary>

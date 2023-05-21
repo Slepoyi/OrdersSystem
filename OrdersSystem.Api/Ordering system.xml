@@ -57,11 +57,12 @@
             <returns>Ok</returns>
             <response code="200">Returns confirmation of DbSets refreshing</response>
         </member>
-        <member name="M:OrdersSystem.Api.Controllers.OrderPickerController.FinishOrder(OrdersSystem.Domain.Models.Ordering.Order)">
+        <member name="M:OrdersSystem.Api.Controllers.OrderPickerController.FinishOrder(System.Collections.Generic.IEnumerable{OrdersSystem.Domain.Models.Ordering.OrderItem},System.Guid)">
             <summary>
             Confirms that order picking has started
             </summary>
-            <param name="order"></param>
+            <param name="orderItems"></param>
+            <param name="id"></param>
             <returns>Confirmation that order was succesfully updated</returns>
             <response code="200">Order was succesfully updated</response>
             <response code="400">Order data is invalid</response>
@@ -70,7 +71,6 @@
             <summary>
             Assign an order to the OrderPicker
             </summary>
-            <param name=""></param>
             <returns>Confirmation that order was assigned</returns>
             <response code="200">Order was assigned to the OrderPicker</response>\
             <response code="404">There is no any Order which can be assigned</response>
