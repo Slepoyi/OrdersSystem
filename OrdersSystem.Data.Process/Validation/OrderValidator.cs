@@ -31,7 +31,7 @@ namespace OrdersSystem.Data.Process.Validation
             return result;
         }
 
-        private void ValidateOrderItem(ValidationResult result, OrderItem orderItem, IItem? stockItem)
+        private static void ValidateOrderItem(ValidationResult result, OrderItem orderItem, IItem? stockItem)
         {
             if (ValidateZeroQuantity(result, orderItem))
                 return;
@@ -41,7 +41,7 @@ namespace OrdersSystem.Data.Process.Validation
                 return;
         }
 
-        private bool ValidateNullRemainings(ValidationResult result, OrderItem orderItem, IItem? item)
+        private static bool ValidateNullRemainings(ValidationResult result, OrderItem orderItem, IItem? item)
         {
             if (item is null)
             {
@@ -53,7 +53,7 @@ namespace OrdersSystem.Data.Process.Validation
             return false;
         }
 
-        private bool ValidateZeroQuantity(ValidationResult result, OrderItem orderItem)
+        private static bool ValidateZeroQuantity(ValidationResult result, OrderItem orderItem)
         {
             if (orderItem.Quantity == 0)
             {
@@ -65,7 +65,7 @@ namespace OrdersSystem.Data.Process.Validation
             return false;
         }
 
-        private bool ValidateQuantityOnStock(ValidationResult result, OrderItem orderItem, IItem item) 
+        private static bool ValidateQuantityOnStock(ValidationResult result, OrderItem orderItem, IItem item) 
         {
             if (item.Quantity < orderItem.Quantity)
             {

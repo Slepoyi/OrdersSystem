@@ -28,7 +28,7 @@ namespace OrdersSystem.Api.Auth.Services
         public async Task<User?> GetByUsernameAsync(string username)
             => await _applicationContext.Users.FindAsync(username);
 
-        private bool CheckPasswordHash(string? passwordHash, string password)
+        private static bool CheckPasswordHash(string? passwordHash, string password)
         {
             if (passwordHash is null)
                 return false;

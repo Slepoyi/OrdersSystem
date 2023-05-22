@@ -46,13 +46,13 @@ namespace OrdersSystem.Data.Process.DataRefresh
             GetRandomOrderItems();
         }
 
-        private byte[] StringToByteArray(string str)
+        private static byte[] StringToByteArray(string str)
         {
             var encoding = new UTF8Encoding();
             return encoding.GetBytes(str);
         }
 
-        private Faker<Sku> SkuFaker()
+        private static Faker<Sku> SkuFaker()
         {
             return new Faker<Sku>()
             .RuleFor(s => s.Id, f => f.Random.Guid())
@@ -69,7 +69,7 @@ namespace OrdersSystem.Data.Process.DataRefresh
             Skus.AddRange(faker.Generate(_fakerOptions.NumSkus));
         }
 
-        private Faker<StockItem> StockItemFaker(Guid skuId)
+        private static Faker<StockItem> StockItemFaker(Guid skuId)
         {
             return new Faker<StockItem>()
             .RuleFor(si => si.Quantity, f => f.Random.UShort(1, 300))
@@ -101,7 +101,7 @@ namespace OrdersSystem.Data.Process.DataRefresh
             OrderItems.AddRange(faker.Generate(_fakerOptions.NumOrderItems));
         }
 
-        private Faker<User> UserFaker(string role)
+        private static Faker<User> UserFaker(string role)
         {
             return new Faker<User>()
             .RuleFor(u => u.Id, f => f.Random.Guid())
@@ -118,7 +118,7 @@ namespace OrdersSystem.Data.Process.DataRefresh
             Users.AddRange(opFaker.Generate(_fakerOptions.NumPickers));
         }
 
-        private Faker<Customer> CustomerFaker(Guid id)
+        private static Faker<Customer> CustomerFaker(Guid id)
         {
             return new Faker<Customer>()
             .RuleFor(c => c.Id, _ => id)
@@ -138,7 +138,7 @@ namespace OrdersSystem.Data.Process.DataRefresh
             }
         }
 
-        private Faker<OrderPicker> OrderPickerFaker(Guid id)
+        private static Faker<OrderPicker> OrderPickerFaker(Guid id)
         {
             return new Faker<OrderPicker>()
             .RuleFor(op => op.Id, _ => id)
@@ -164,7 +164,8 @@ namespace OrdersSystem.Data.Process.DataRefresh
             .RuleFor(o => o.CloseTime, f => f.Date.Recent())
             .RuleFor(o => o.OrderStatus, _ => OrderStatus.Finished)
             .RuleFor(o => o.CustomerId, f => f.PickRandom(Customers).Id)
-            .RuleFor(o => o.OrderPickerId, f => f.PickRandom(OrderPickers).Id);
+            .RuleFor(o => o.OrderPickerId, f => f.PickRandom(
+                OrderPickers.Where(op => op.Id != Guid.Empty)).Id);
         }
 
         private void GetRandomOrders()
