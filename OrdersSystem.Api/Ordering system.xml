@@ -66,6 +66,7 @@
             <returns>Confirmation that order was succesfully updated</returns>
             <response code="200">Order was succesfully updated</response>
             <response code="400">Order data is invalid</response>
+            <response code="403">Order does not belong to the picker</response>
         </member>
         <member name="M:OrdersSystem.Api.Controllers.OrderPickerController.AssignOrderAsync">
             <summary>
