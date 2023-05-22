@@ -2,12 +2,12 @@
 
 namespace OrdersSystem.Domain.Models.Stock
 {
-    public class ReserveItem
+    public class ReserveItem : IItem
     {
         [Key]
         public Guid Id { get; set; }
         public virtual Sku Sku { get; set; }
         public Guid SkuId { get; set; }
-        public uint StockBalance { get; set; }
+        public uint Quantity { get; set; }
     }
 }

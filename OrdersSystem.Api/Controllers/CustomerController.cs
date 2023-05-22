@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using OrdersSystem.Api.Auth.Middleware;
 using OrdersSystem.Data.Process.Services;
 using OrdersSystem.Domain.Enums;
@@ -7,7 +6,6 @@ using OrdersSystem.Domain.Models.Auth;
 using OrdersSystem.Domain.Models.Extensions;
 using OrdersSystem.Domain.Models.Ordering;
 using OrdersSystem.Domain.Models.Stock;
-using System.Diagnostics;
 
 namespace OrdersSystem.Api.Controllers
 {
@@ -40,7 +38,7 @@ namespace OrdersSystem.Api.Controllers
 
             var stockItems = _orderManager.GetStockForOrderItems(orderItems);
 
-            var validationResult = _orderManager.CustomerValidateOrder(orderItems, stockItems);
+            var validationResult = _orderManager.ValidateOrder(orderItems, stockItems);
             if (!validationResult.IsValid)
                 return BadRequest(validationResult.ErrorMessages);
 

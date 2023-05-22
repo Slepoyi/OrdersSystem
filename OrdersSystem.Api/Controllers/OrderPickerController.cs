@@ -40,7 +40,7 @@ namespace OrdersSystem.Api.Controllers
 
             var reserveItems = _orderManager.GetReserveForOrderItems(orderItems);
 
-            var validationResult = _orderManager.PickerValidateOrder(orderItems, reserveItems);
+            var validationResult = _orderManager.ValidateOrder(orderItems, reserveItems);
             if (!validationResult.IsValid)
                 return BadRequest(validationResult.ErrorMessages);
 

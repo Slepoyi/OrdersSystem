@@ -5,7 +5,6 @@ namespace OrdersSystem.Data.Process.Validation
 {
     public interface IOrderValidator
     {
-        ValidationResult CustomerValidateOrder(IEnumerable<OrderItem> orderItems, IEnumerable<StockItem> stockItems);
-        ValidationResult PickerValidateOrder(IEnumerable<OrderItem> orderItems, IEnumerable<ReserveItem> reserveItems);
+        ValidationResult ValidateOrder(IEnumerable<OrderItem> orderItems, IEnumerable<IItem> items);
     }
 }

@@ -20,15 +20,11 @@ namespace OrdersSystem.Data.Process.Services
             _clock = clock;
         }
 
-        public ValidationResult CustomerValidateOrder(IEnumerable<OrderItem> orderItems, IEnumerable<StockItem> stockItems)
+        public ValidationResult ValidateOrder(IEnumerable<OrderItem> orderItems, IEnumerable<IItem> items)
         {
-            return _orderValidator.CustomerValidateOrder(orderItems, stockItems);
+            return _orderValidator.ValidateOrder(orderItems, items);
         }
 
-        public ValidationResult PickerValidateOrder(IEnumerable<OrderItem> orderItems, IEnumerable<ReserveItem> reserveItem)
-        {
-            return _orderValidator.PickerValidateOrder(orderItems, reserveItem);
-        }
 
         public async Task<Order?> GetByGuidAsync(Guid id)
         {
@@ -165,10 +161,10 @@ namespace OrdersSystem.Data.Process.Services
                         {
                             Sku = orderItem.Sku,
                             SkuId = orderItem.SkuId,
-                            StockBalance = orderItem.Quantity
+                            Quantity = orderItem.Quantity
                         });
                 else
-                    reserveItem.StockBalance += orderItem.Quantity;
+                    reserveItem.Quantity += orderItem.Quantity;
             }
             return true;
         }
@@ -188,11 +184,11 @@ namespace OrdersSystem.Data.Process.Services
             foreach (var orderItem in order.OrderItems)
             {
                 var reserveItem = await _applicationContext.ReservedItems.FirstOrDefaultAsync(s => s.SkuId == orderItem.SkuId);
-                var balance = reserveItem.StockBalance - orderItem.Quantity;
+                var balance = reserveItem.Quantity - orderItem.Quantity;
                 if (balance == 0)
                     _applicationContext.ReservedItems.Remove(reserveItem);
                 else
-                    reserveItem.StockBalance -= orderItem.Quantity;
+                    reserveItem.Quantity -= orderItem.Quantity;
             }
         }
     }

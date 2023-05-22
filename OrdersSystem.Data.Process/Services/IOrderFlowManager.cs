@@ -6,8 +6,7 @@ namespace OrdersSystem.Data.Process.Services
 {
     public interface IOrderFlowManager
     {
-        ValidationResult CustomerValidateOrder(IEnumerable<OrderItem> orderItems, IEnumerable<StockItem> stockItems);
-        ValidationResult PickerValidateOrder(IEnumerable<OrderItem> orderItems, IEnumerable<ReserveItem> reserveItems);
+        ValidationResult ValidateOrder(IEnumerable<OrderItem> orderItems, IEnumerable<IItem> items);
         IEnumerable<ReserveItem> GetReserveForOrderItems(IEnumerable<OrderItem> orderItems);
         IEnumerable<StockItem> GetStockForOrderItems(IEnumerable<OrderItem> orderItems);
         IEnumerable<StockItem> GetStock();

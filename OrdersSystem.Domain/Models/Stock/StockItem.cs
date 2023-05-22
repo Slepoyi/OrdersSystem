@@ -2,7 +2,7 @@
 
 namespace OrdersSystem.Domain.Models.Stock
 {
-    public class StockItem
+    public class StockItem : IItem
     {
         [Key]
         public Guid Id { get; set; }
