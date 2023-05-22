@@ -16,7 +16,6 @@ namespace OrdersSystem.Data.Process.Validation
 
             if (duplicateIds.Any())
             {
-                result.IsValid = false;
                 result.ErrorCodes.Add(OrderErrorCode.DuplicateId);
                 foreach (var duplicateId in duplicateIds)
                     result.ErrorMessages.Add($"Duplicate OrderItem Id {duplicateId} was found.");
@@ -45,7 +44,6 @@ namespace OrdersSystem.Data.Process.Validation
         {
             if (item is null)
             {
-                result.IsValid = false;
                 result.ErrorMessages.Add($"Sku '{orderItem.SkuId}' not found in stock.");
                 result.ErrorCodes.Add(OrderErrorCode.SkuIdNotFound);
                 return true;
@@ -57,7 +55,6 @@ namespace OrdersSystem.Data.Process.Validation
         {
             if (orderItem.Quantity == 0)
             {
-                result.IsValid = false;
                 result.ErrorMessages.Add($"Zero quantity for '{orderItem.SkuId}'.");
                 result.ErrorCodes.Add(OrderErrorCode.ZeroQuantity);
                 return true;
@@ -69,7 +66,6 @@ namespace OrdersSystem.Data.Process.Validation
         {
             if (item.Quantity < orderItem.Quantity)
             {
-                result.IsValid = false;
                 result.ErrorMessages.Add($"Insufficient remaining for {item.GetType()} '{orderItem.SkuId}'.");
                 result.ErrorCodes.Add(OrderErrorCode.InsufficientSkuStock);
                 return true;
