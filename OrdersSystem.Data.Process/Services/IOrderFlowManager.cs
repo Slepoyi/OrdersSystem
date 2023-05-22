@@ -10,6 +10,7 @@ namespace OrdersSystem.Data.Process.Services
         IEnumerable<ReserveItem> GetReserveForOrderItems(IEnumerable<OrderItem> orderItems);
         IEnumerable<StockItem> GetStockForOrderItems(IEnumerable<OrderItem> orderItems);
         IEnumerable<StockItem> GetStock();
+        bool CustomerHasOpenedOrder(Guid id);
         Task<Order?> GetByGuidAsync(Guid id);
         Task<Order?> CreateOrderAsync(IEnumerable<OrderItem> orderItems, Guid userGuid, IEnumerable<StockItem> stockItems);
         Task<bool> CancelOrderAsync(Order order);

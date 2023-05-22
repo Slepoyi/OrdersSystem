@@ -25,6 +25,13 @@ namespace OrdersSystem.Data.Process.Services
             return _orderValidator.ValidateOrder(orderItems, items);
         }
 
+        public bool CustomerHasOpenedOrder(Guid id)
+        {
+            var order = _applicationContext.Orders
+                .FirstOrDefault(o => o.CustomerId == id && o.OrderStatus != OrderStatus.Finished);
+
+            return order is not null;
+        }
 
         public async Task<Order?> GetByGuidAsync(Guid id)
         {

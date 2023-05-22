@@ -36,6 +36,9 @@ namespace OrdersSystem.Api.Controllers
         {
             var user = HttpContext.Items["User"] as User;
 
+            if (_orderManager.CustomerHasOpenedOrder(user.Id))
+                return Problem(detail: "You cannot place an order until previous is finished.", statusCode: StatusCodes.Status501NotImplemented);
+
             var stockItems = _orderManager.GetStockForOrderItems(orderItems);
 
             var validationResult = _orderManager.ValidateOrder(orderItems, stockItems);
@@ -70,7 +73,7 @@ namespace OrdersSystem.Api.Controllers
             var order = await _orderManager.GetByGuidAsync(id);
 
             if (order is null)
-                return NotFound(new { Detail = "Order with this id was not found" });
+                return NotFound(new { Detail = "Order with this id was not found." });
 
             if (order.CustomerId != user.Id)
                 return Problem(detail: "You cannot track this order.", statusCode: StatusCodes.Status403Forbidden);
@@ -78,9 +81,9 @@ namespace OrdersSystem.Api.Controllers
             var cancelled = await _orderManager.CancelOrderAsync(order);
 
             if (!cancelled)
-                return Problem(detail: "Sorry, your order cannot be cancelled.", statusCode: StatusCodes.Status501NotImplemented);
+                return Problem(detail: "Sorry, your order is processed thus cannot be cancelled.", statusCode: StatusCodes.Status501NotImplemented);
 
-            return Ok(new { Detail = "Order was cancelled" });
+            return Ok(new { Detail = "Order was cancelled." });
         }
 
         /// <summary>
