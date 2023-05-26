@@ -13,6 +13,7 @@ namespace OrdersSystem.IntegrationTests
             _factory = factory;
         }
 
+        [Fact]
         public async Task CreateOrder_ReturnsOk_WhenOrderIsValid(IEnumerable<OrderItem> orderItems)
         {
             var client = _factory.CreateClient();
