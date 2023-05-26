@@ -30,12 +30,12 @@ namespace OrdersSystem.Data.Process.DataRefresh
         {
             Randomizer.Seed = new Random(42069);
 
-            Users = new List<User>();
-            Skus = new List<Sku>();
-            StockItems = new List<StockItem>();
-            Customers = new List<Customer>();
-            OrderPickers = new List<OrderPicker>();
-            OrderItems = new List<OrderItem>();
+            Users = new();
+            Skus = new();
+            StockItems = new();
+            Customers = new();
+            OrderPickers = new();
+            OrderItems = new();
 
             GetRandomSkus();
             GetRandomStockItems();
@@ -161,7 +161,8 @@ namespace OrdersSystem.Data.Process.DataRefresh
             return new Faker<Order>()
             .RuleFor(o => o.Id, f => f.Random.Guid())
             .RuleFor(o => o.OpenTime, f => f.Date.Past())
-            .RuleFor(o => o.CloseTime, f => f.Date.Recent())
+            .RuleFor(o => o.PickingStartTime, (f, o) => f.Date.Recent(1, o.OpenTime))
+            .RuleFor(o => o.CloseTime, (f, o) => f.Date.Recent(1, o.PickingStartTime))
             .RuleFor(o => o.OrderStatus, _ => OrderStatus.Finished)
             .RuleFor(o => o.CustomerId, f => f.PickRandom(Customers).Id)
             .RuleFor(o => o.OrderPickerId, f => f.PickRandom(
