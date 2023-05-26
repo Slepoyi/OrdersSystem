@@ -14,6 +14,18 @@ namespace OrdersSystem.Data.Process.Validation
                 .Where(i => i.Count() > 1)
                 .Select(i => i.Key);
 
+            IEnumerable<Guid> duplicateSkuIds = orderItems
+                .GroupBy(i => i.SkuId)
+                .Where(i => i.Count() > 1)
+                .Select(i => i.Key);
+
+            if (duplicateSkuIds.Any())
+            {
+                result.ErrorCodes.Add(OrderErrorCode.DuplicateId);
+                foreach (var duplicateId in duplicateSkuIds)
+                    result.ErrorMessages.Add($"Duplicate OrderItem SkuId {duplicateId} was found.");
+            }
+
             if (duplicateIds.Any())
             {
                 result.ErrorCodes.Add(OrderErrorCode.DuplicateId);
