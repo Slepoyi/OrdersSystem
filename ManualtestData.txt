@@ -1,0 +1,147 @@
+
+https://localhost:7081/api/data/refresh/
+Customer
+{
+    "username": "Aliya_Cruickshank", 
+    "password", "PVBCbyoW"
+}
+
+Picker
+{
+    "username": "Arthur_Bayer", 
+    "password", "xt33OZOb"
+}
+
+https://localhost:7081/api/customers/create_order/
+pass
+[
+    {
+        "id": "7184714D-05AB-4406-8CD2-EBE1419912B8",
+        "skuid": "B9062C62-9A5D-A0FB-CDBA-EB80445E1187",
+        "quantity": 14
+    },
+    {
+        "id": "76318734-1B59-425E-B600-167EE93D692B",
+        "skuid": "613DCD97-383E-ADD6-4E28-337396AD9585",
+        "quantity": 3
+    },
+    {
+        "id": "15229275-9DAB-40B3-95B5-59D47B9AE936",
+        "skuid": "833C33B0-35A1-84B3-01B6-68F725707101",
+        "quantity": 8
+    }
+]
+
+dupl ids
+[
+    {
+        "id": "7184714D-05AB-4406-8CD2-EBE1419912B8",
+        "skuid": "B9062C62-9A5D-A0FB-CDBA-EB80445E1187",
+        "quantity": 14
+    },
+    {
+        "id": "7184714D-05AB-4406-8CD2-EBE1419912B8",
+        "skuid": "613DCD97-383E-ADD6-4E28-337396AD9585",
+        "quantity": 3
+    },
+    {
+        "id": "15229275-9DAB-40B3-95B5-59D47B9AE936",
+        "skuid": "833C33B0-35A1-84B3-01B6-68F725707101",
+        "quantity": 8
+    }
+]
+
+dupl sku ids
+[
+    {
+        "id": "7184714D-05AB-4406-8CD2-EBE1419912B8",
+        "skuid": "B9062C62-9A5D-A0FB-CDBA-EB80445E1187",
+        "quantity": 14
+    },
+    {
+        "id": "76318734-1B59-425E-B600-167EE93D692B",
+        "skuid": "B9062C62-9A5D-A0FB-CDBA-EB80445E1187",
+        "quantity": 3
+    },
+    {
+        "id": "15229275-9DAB-40B3-95B5-59D47B9AE936",
+        "skuid": "833C33B0-35A1-84B3-01B6-68F725707101",
+        "quantity": 8
+    }
+]
+
+more than stock
+[
+    {
+        "id": "7184714D-05AB-4406-8CD2-EBE1419912B8",
+        "skuid": "B9062C62-9A5D-A0FB-CDBA-EB80445E1187",
+        "quantity": 14
+    },
+    {
+        "id": "76318734-1B59-425E-B600-167EE93D692B",
+        "skuid": "B9062C62-9A5D-A0FB-CDBA-EB80445E1187",
+        "quantity": 800
+    },
+    {
+        "id": "15229275-9DAB-40B3-95B5-59D47B9AE936",
+        "skuid": "833C33B0-35A1-84B3-01B6-68F725707101",
+        "quantity": 8
+    }
+]
+
+negative quantity
+[
+    {
+        "id": "7184714D-05AB-4406-8CD2-EBE1419912B8",
+        "skuid": "B9062C62-9A5D-A0FB-CDBA-EB80445E1187",
+        "quantity": -4
+    },
+    {
+        "id": "76318734-1B59-425E-B600-167EE93D692B",
+        "skuid": "B9062C62-9A5D-A0FB-CDBA-EB80445E1187",
+        "quantity": 1
+    },
+    {
+        "id": "15229275-9DAB-40B3-95B5-59D47B9AE936",
+        "skuid": "833C33B0-35A1-84B3-01B6-68F725707101",
+        "quantity": 8
+    }
+]
+
+zero quantity
+[
+    {
+        "id": "7184714D-05AB-4406-8CD2-EBE1419912B8",
+        "skuid": "B9062C62-9A5D-A0FB-CDBA-EB80445E1187",
+        "quantity": 0
+    },
+    {
+        "id": "76318734-1B59-425E-B600-167EE93D692B",
+        "skuid": "B9062C62-9A5D-A0FB-CDBA-EB80445E1187",
+        "quantity": 1
+    },
+    {
+        "id": "15229275-9DAB-40B3-95B5-59D47B9AE936",
+        "skuid": "833C33B0-35A1-84B3-01B6-68F725707101",
+        "quantity": 8
+    }
+]
+
+unexisting skuid
+[
+    {
+        "id": "7184714D-05AB-4406-8CD2-EBE1419912B8",
+        "skuid": "068DE354-01DF-4848-965E-ABE2A9B16DBF",
+        "quantity": 14
+    },
+    {
+        "id": "76318734-1B59-425E-B600-167EE93D692B",
+        "skuid": "613DCD97-383E-ADD6-4E28-337396AD9585",
+        "quantity": 3
+    },
+    {
+        "id": "15229275-9DAB-40B3-95B5-59D47B9AE936",
+        "skuid": "833C33B0-35A1-84B3-01B6-68F725707101",
+        "quantity": 8
+    }
+]
