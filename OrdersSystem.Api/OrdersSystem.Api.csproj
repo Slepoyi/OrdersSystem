@@ -32,5 +32,9 @@
     <ProjectReference Include="..\OrdersSystem.Data.Process\OrdersSystem.Data.Process.csproj" />
     <ProjectReference Include="..\OrdersSystem.Domain\OrdersSystem.Domain.csproj" />
   </ItemGroup>
+	
+  <ItemGroup>
+	<InternalsVisibleTo Include="..\OrdersSystem.IntegrationTests" />
+  </ItemGroup>
 
 </Project>
