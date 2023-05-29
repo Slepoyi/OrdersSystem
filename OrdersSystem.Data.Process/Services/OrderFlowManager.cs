@@ -126,7 +126,10 @@ namespace OrdersSystem.Data.Process.Services
                 OpenTime = _clock.Now,
             };
             foreach (var item in orderItems)
+            {
+                item.Id = Guid.NewGuid();
                 item.OrderId = order.Id;
+            }
 
             await ReserveOrderInDatabaseAsync(order, stockItems, orderItems);
 

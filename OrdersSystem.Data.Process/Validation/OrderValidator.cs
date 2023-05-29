@@ -9,11 +9,6 @@ namespace OrdersSystem.Data.Process.Validation
         {
             var result = new ValidationResult();
 
-            IEnumerable<Guid> duplicateIds = orderItems
-                .GroupBy(i => i.Id)
-                .Where(i => i.Count() > 1)
-                .Select(i => i.Key);
-
             IEnumerable<Guid> duplicateSkuIds = orderItems
                 .GroupBy(i => i.SkuId)
                 .Where(i => i.Count() > 1)
@@ -24,13 +19,6 @@ namespace OrdersSystem.Data.Process.Validation
                 result.ErrorCodes.Add(OrderErrorCode.DuplicateId);
                 foreach (var duplicateId in duplicateSkuIds)
                     result.ErrorMessages.Add($"Duplicate OrderItem SkuId {duplicateId} was found.");
-            }
-
-            if (duplicateIds.Any())
-            {
-                result.ErrorCodes.Add(OrderErrorCode.DuplicateId);
-                foreach (var duplicateId in duplicateIds)
-                    result.ErrorMessages.Add($"Duplicate OrderItem Id {duplicateId} was found.");
             }
 
             foreach (var orderItem in orderItems)
