@@ -8,6 +8,7 @@ namespace OrdersSystem.Domain.Models.Auth
         [Required]
         public Guid Id { get; set; }
         [Key]
+        [MinLength(6)]
         public string Username { get; set; }
         [Required]
         public string Role { get; set; }

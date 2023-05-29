@@ -5,6 +5,7 @@ namespace OrdersSystem.Domain.Models.Auth
     public class LoginModel
     {
         [Required]
+        [MinLength(6)]
         public string Username { get; set; }
         [Required]
         [DataType(DataType.Password)]
