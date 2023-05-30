@@ -1,3 +1,5 @@
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using OrdersSystem.Api.Auth.Middleware;
@@ -21,7 +23,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "Ordering system", Version = "v1" });
-    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Ordering system.xml"));
+    //options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Ordering system.xml"));
+    options.IncludeXmlComments("C:\\Users\\Павел\\Desktop\\OrdersSystem\\OrdersSystem.Api\\Ordering system.xml");
 });
 
 builder.Services.AddHttpContextAccessor();
@@ -53,6 +56,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapHealthChecks("/_health", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<JwtMiddleware>();
