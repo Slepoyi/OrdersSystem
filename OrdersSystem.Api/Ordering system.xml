@@ -51,9 +51,16 @@
             <returns>Collection of StockItems</returns>
             <response code="200">Returns a collection of Stockitems</response>
         </member>
-        <member name="M:OrdersSystem.Api.Controllers.FakeDataController.RefreshDb">
+        <member name="M:OrdersSystem.Api.Controllers.FakeDataController.RefreshDbCustomer">
             <summary>
-            Refreshes all the DbSets with randomly generated information
+            Refreshes all the DbSets with newly generated information
+            </summary>
+            <returns>Ok</returns>
+            <response code="200">Returns confirmation of DbSets refreshing</response>
+        </member>
+        <member name="M:OrdersSystem.Api.Controllers.FakeDataController.RefreshDbPicker">
+            <summary>
+            Refreshes all the DbSets with newly generated information
             </summary>
             <returns>Ok</returns>
             <response code="200">Returns confirmation of DbSets refreshing</response>

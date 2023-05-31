@@ -15,14 +15,26 @@ namespace OrdersSystem.Api.Controllers
         }
 
         /// <summary>
-        /// Refreshes all the DbSets with randomly generated information
+        /// Refreshes all the DbSets with newly generated information
         /// </summary>
         /// <returns>Ok</returns>
         /// <response code="200">Returns confirmation of DbSets refreshing</response>
-        [HttpPost("refresh/")]
-        public IActionResult RefreshDb()
+        [HttpPost("_refresh_customer/")]
+        public IActionResult RefreshDbCustomer()
         {
-            _dbSetsRefresher.Refresh();
+            _dbSetsRefresher.RefreshForCustomerTests();
+            return Ok();
+        }
+
+        /// <summary>
+        /// Refreshes all the DbSets with newly generated information
+        /// </summary>
+        /// <returns>Ok</returns>
+        /// <response code="200">Returns confirmation of DbSets refreshing</response>
+        [HttpPost("_refresh_picker/")]
+        public IActionResult RefreshDbPicker()
+        {
+            _dbSetsRefresher.RefreshForPickerTests();
             return Ok();
         }
     }

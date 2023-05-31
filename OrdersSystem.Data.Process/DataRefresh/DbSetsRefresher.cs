@@ -1,4 +1,5 @@
 ﻿using OrdersSystem.Data.Access.Context;
+using OrdersSystem.Data.Process.Services;
 using OrdersSystem.Domain.Models.Auth;
 using OrdersSystem.Domain.Models.Ordering;
 using OrdersSystem.Domain.Models.Stock;
@@ -9,14 +10,41 @@ namespace OrdersSystem.Data.Process.DataRefresh
     {
         private readonly ApplicationContext _applicationContext;
         private readonly IDataGenerator _dataGenerator;
+        private readonly IOrderFlowManager _orderFlowManager;
 
-        public DbSetsRefresher(ApplicationContext applicationContext, IDataGenerator dataGenerator)
+        public DbSetsRefresher(ApplicationContext applicationContext, IDataGenerator dataGenerator,
+            IOrderFlowManager orderFlowManager)
         {
+            _orderFlowManager = orderFlowManager;
             _applicationContext = applicationContext;
             _dataGenerator = dataGenerator;
         }
 
-        public void Refresh()
+        public void RefreshForPickerTests()
+        {
+            var orderItems = new List<OrderItem>
+            {
+                new OrderItem
+                {
+                    SkuId = new Guid("B9062C62-9A5D-A0FB-CDBA-EB80445E1187"),
+                    Quantity = 6
+                },
+                new OrderItem
+                {
+                    SkuId = new Guid("613DCD97-383E-ADD6-4E28-337396AD9585"),
+                    Quantity = 2
+                },
+                new OrderItem
+                {
+                    SkuId = new Guid("833C33B0-35A1-84B3-01B6-68F725707101"),
+                    Quantity = 1
+                }
+            };
+            var stock = _orderFlowManager.GetStockForOrderItems(orderItems);
+            var result = _orderFlowManager.CreateOrderAsync(orderItems, new Guid(""), stock);
+        }
+
+        public void RefreshForCustomerTests()
         {
             ClearEntityDbSet<User>();
             ClearEntityDbSet<Customer>();

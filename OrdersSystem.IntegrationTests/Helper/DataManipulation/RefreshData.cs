@@ -2,9 +2,15 @@
 {
     public class RefreshData
     {
-        public static async Task RefreshAsync(HttpClient client)
+        public static async Task RefreshForCustomerTestsAsync(HttpClient client)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, "/api/data/refresh");
+            var request = new HttpRequestMessage(HttpMethod.Post, "/api/data/_refresh_customer");
+            await client.SendAsync(request);
+        }
+
+        public static async Task RefreshForPickerTestsAsync(HttpClient client)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, "/api/data/_refresh_picker");
             await client.SendAsync(request);
         }
     }

@@ -2,6 +2,8 @@
 {
     public interface IDbSetsRefresher
     {
-        void Refresh();
+        void RefreshForCustomerTests();
+
+        void RefreshForPickerTests();
     }
 }
