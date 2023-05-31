@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
+﻿using Microsoft.AspNetCore.Mvc.Testing;
 using OrdersSystem.Domain.Models.Auth;
+using OrdersSystem.IntegrationTests.Helper.DataManipulation;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -21,7 +21,11 @@ namespace OrdersSystem.IntegrationTests.Tests.Authorization
         {
             var response = await _client.PostAsJsonAsync("/api/auth/", loginModel);
 
-            response.EnsureSuccessStatusCode();
+            response.EnsureSuccessStatusCode(); // assert no exception
+
+            var token = await response.Content.ReadFromJsonAsync<TokenModel>();
+
+            Assert.NotNull(token?.Token);
         }
 
         [Theory]

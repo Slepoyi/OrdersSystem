@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
-using Newtonsoft.Json.Linq;
+using OrdersSystem.Domain.Models.Auth;
+using OrdersSystem.Domain.Models.Dto;
 using OrdersSystem.Domain.Models.Ordering;
 using OrdersSystem.Domain.Models.Stock;
 using OrdersSystem.IntegrationTests.Helper.DataManipulation;
@@ -18,20 +19,24 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         private const string _getOrderPath = "/api/customers/get_order/{0}";
         private const string _getStockPath = "/api/customers/get_stock";
         private readonly HttpClient _client;
-        private readonly string _token;
+        private readonly string? _token;
         private string? _freshOrderId;
 
         public CustomerTests(WebApplicationFactory<Program> factory)
         {
             _client = factory.CreateClient();
-            _token = JwtHelper.GetCustomerTokenAsync(_client).Result;
+            _token = JwtHelper.GetTokenAsync(_client, new LoginModel
+            {
+                Username = "Aliya_Cruickshank",
+                Password = "PVBCbyoW"
+            }).Result;
         }
 
         [Theory, TestPriority(1)]
         [MemberData(nameof(CustomerData.CorrectOrderItems), MemberType = typeof(CustomerData))]
         public async Task CreateOrder_ReturnsUnauthorized_WhenNoTokenPassed(IEnumerable<OrderItem> orderItems)
         {
-            await RefreshData.RefreshAsync(_client); // clutch, see github.com/xunit/xunit/issues/2347
+            await RefreshData.RefreshForCustomerTestsAsync(_client); // clutch, see github.com/xunit/xunit/issues/2347
 
             var request = new HttpRequestMessage(HttpMethod.Post, _createOrderPath);
             request.Content = JsonContent.Create(orderItems);
@@ -72,8 +77,12 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
             request.Content = JsonContent.Create(orderItems);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
             var response = await _client.SendAsync(request);
+
             _freshOrderId = response.Headers.Location?.Segments.Last();
 
+            var ex = Record.Exception(() => Guid.Parse(_freshOrderId));
+
+            Assert.Null(ex);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         }
 
@@ -177,6 +186,9 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
             var response = await _client.SendAsync(request);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            var orderDto = await response.Content.ReadFromJsonAsync<OrderDto>();
+            Assert.NotNull(orderDto);
         }
 
         [Fact, TestPriority(13)]
@@ -185,9 +197,11 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
             var request = new HttpRequestMessage(HttpMethod.Get, _getStockPath);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
             var response = await _client.SendAsync(request);
-            var stock = await response.Content.ReadFromJsonAsync<IEnumerable<StockItem>>();
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            var stock = await response.Content.ReadFromJsonAsync<IEnumerable<StockItem>>();
+            
             Assert.Equal(20, stock?.Count());
         }
     }
