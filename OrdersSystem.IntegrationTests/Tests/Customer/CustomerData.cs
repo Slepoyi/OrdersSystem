@@ -14,23 +14,23 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
                         new OrderItem
                         {
                             SkuId = new Guid("B9062C62-9A5D-A0FB-CDBA-EB80445E1187"),
-                            Quantity = 14
+                            Quantity = 6
                         },
                         new OrderItem
                         {
                             SkuId = new Guid("613DCD97-383E-ADD6-4E28-337396AD9585"),
-                            Quantity = 3
+                            Quantity = 4
                         },
                         new OrderItem
                         {
                             SkuId = new Guid("833C33B0-35A1-84B3-01B6-68F725707101"),
-                            Quantity = 8
+                            Quantity = 2
                         }
                     }
                 }
             };
 
-        // duplicate skuid and zero quantity
+        // duplicate skuid, zero quantity and more than on stock
         public static IEnumerable<object[]> IncorrectOrderItems =>
            new List<object[]>
            {
@@ -41,7 +41,7 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
                         new OrderItem
                         {
                             SkuId = new Guid("B9062C62-9A5D-A0FB-CDBA-EB80445E1187"),
-                            Quantity = 14
+                            Quantity = 10000
                         },
                         new OrderItem
                         {
