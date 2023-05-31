@@ -29,9 +29,11 @@ namespace OrdersSystem.Api.Controllers
         /// <returns>A newly generated order</returns>
         /// <response code="201">Returns the newly created order</response>
         /// <response code="400">If any of StockItems is invalid</response>
+        /// <response code="501">If customer has currently opened order</response>
         [HttpPost("create_order/")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status501NotImplemented)]
         public async Task<IActionResult> CreateOrderAsync([FromBody] IEnumerable<OrderItem> orderItems)
         {
             var user = HttpContext.Items["User"] as User;

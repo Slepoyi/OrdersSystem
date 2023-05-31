@@ -30,19 +30,15 @@ namespace OrdersSystem.Api.Controllers
         /// <response code="200">Order was succesfully updated</response>
         /// <response code="400">Order data is invalid</response>
         /// <response code="403">Order does not belong to the picker</response>
+        /// <response code="404">Order with this id was not found</response>
         [HttpPost("finish/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> FinishOrder([FromBody] IEnumerable<OrderItem> orderItems, Guid id)
         {
             var user = HttpContext.Items["User"] as User;
-
-            var reserveItems = _orderManager.GetReserveForOrderItems(orderItems);
-
-            var validationResult = _orderManager.ValidateOrder(orderItems, reserveItems);
-            if (!validationResult.IsValid)
-                return BadRequest(validationResult.ErrorMessages);
 
             var order = await _orderManager.GetByGuidAsync(id);
             if (order is null)
@@ -51,9 +47,15 @@ namespace OrdersSystem.Api.Controllers
             if (order.OrderPickerId != user.Id)
                 return Problem(detail: "You cannot finish this order.", statusCode: StatusCodes.Status403Forbidden);
 
+            var reserveItems = _orderManager.GetReserveForOrderItems(orderItems);
+
+            var validationResult = _orderManager.ValidateOrder(orderItems, reserveItems);
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.ErrorMessages);
+
             var closed = await _orderManager.CloseOrder(order, user.Id, orderItems);
             if (!closed)
-                return BadRequest(new { Detail = "Sorry, there is something wrong with your order data." });
+                return BadRequest(new { Detail = "Sorry, this order cannot be closed." });
 
             return Ok(new { Detail = "Order was successfully closed." });
         }

@@ -21,6 +21,7 @@
             <returns>A newly generated order</returns>
             <response code="201">Returns the newly created order</response>
             <response code="400">If any of StockItems is invalid</response>
+            <response code="501">If customer has currently opened order</response>
         </member>
         <member name="M:OrdersSystem.Api.Controllers.CustomerController.CancelOrderAsync(System.Guid)">
             <summary>
@@ -67,6 +68,7 @@
             <response code="200">Order was succesfully updated</response>
             <response code="400">Order data is invalid</response>
             <response code="403">Order does not belong to the picker</response>
+            <response code="404">Order with this id was not found</response>
         </member>
         <member name="M:OrdersSystem.Api.Controllers.OrderPickerController.AssignOrderAsync">
             <summary>
