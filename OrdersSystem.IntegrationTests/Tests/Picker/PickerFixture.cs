@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using OrdersSystem.Data.Process.Services;
 using OrdersSystem.Domain.Models.Auth;
-using OrdersSystem.IntegrationTests.Helper.DataManipulation;
 
 namespace OrdersSystem.IntegrationTests.Tests.Picker
 {
