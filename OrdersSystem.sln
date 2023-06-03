@@ -6,9 +6,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9EE63AE7-F461-4833-9DEF-0DA50D55D768}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F1400754-D67B-4C40-B833-11C9BD749693}"
-	ProjectSection(SolutionItems) = preProject
-		ManualtestData.txt = ManualtestData.txt
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrdersSystem.Domain", "OrdersSystem.Domain\OrdersSystem.Domain.csproj", "{D9D30EAE-246B-42D7-8E49-BB95AB028CD7}"
 EndProject
@@ -25,7 +22,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrdersSystem.Data.Process",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrdersSystem.Data.Fake", "OrdersSystem.Data.Fake\OrdersSystem.Data.Fake.csproj", "{FDAAFF26-6E3F-4BF3-8EB3-AC1E9C94DC73}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrdersSystem.IntegrationTests", "OrdersSystem.IntegrationTests\OrdersSystem.IntegrationTests.csproj", "{293AF5EA-059D-4044-A244-58B8DF7C0A5D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrdersSystem.IntegrationTests", "OrdersSystem.IntegrationTests\OrdersSystem.IntegrationTests.csproj", "{293AF5EA-059D-4044-A244-58B8DF7C0A5D}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0C0D51CB-BEC4-478D-85CB-C665EE025987} = {0C0D51CB-BEC4-478D-85CB-C665EE025987}
 	EndProjectSection
