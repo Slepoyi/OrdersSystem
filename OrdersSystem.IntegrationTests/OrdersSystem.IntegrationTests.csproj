@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OrdersSystem.Api\OrdersSystem.Api.csproj" />
+    <ProjectReference Include="..\OrdersSystem.Data.Process\OrdersSystem.Data.Process.csproj" />
     <ProjectReference Include="..\OrdersSystem.Domain\OrdersSystem.Domain.csproj" />
   </ItemGroup>
 
