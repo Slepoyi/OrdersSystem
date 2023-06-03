@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
+using OrdersSystem.Data.Process.Services;
 using OrdersSystem.Domain.Models.Auth;
 using OrdersSystem.Domain.Models.Dto;
 using OrdersSystem.Domain.Models.Ordering;
@@ -14,16 +15,18 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
     [TestCaseOrderer("OrdersSystem.IntegrationTests.Helper.Prioritize.PriorityOrderer", "OrdersSystem.IntegrationTests")]
     public class CustomerTests : IClassFixture<WebApplicationFactory<Program>>
     {
-        private const string _createOrderPath = "/api/customers/create_order";
-        private const string _cancelOrderPath = "/api/customers/cancel_order/{0}";
-        private const string _getOrderPath = "/api/customers/get_order/{0}";
-        private const string _getStockPath = "/api/customers/get_stock";
+        private const string CreateOrderPath = "/api/customers/create_order";
+        private const string CancelOrderPath = "/api/customers/cancel_order/{0}";
+        private const string GetOrderPath = "/api/customers/get_order/{0}";
+        private const string GetStockPath = "/api/customers/get_stock";
+        private readonly IOrderFlowManager _orderManager;
         private readonly HttpClient _client;
         private readonly string? _token;
-        private string? _freshOrderId;
-
-        public CustomerTests(WebApplicationFactory<Program> factory)
+        private string? _orderId;
+        
+        public CustomerTests(IOrderFlowManager orderFlowManager, WebApplicationFactory<Program> factory)
         {
+            _orderManager = orderFlowManager;
             _client = factory.CreateClient();
             _token = JwtHelper.GetTokenAsync(_client, new LoginModel
             {
@@ -38,7 +41,7 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         {
             await RefreshData.RefreshForCustomerTestsAsync(_client); // clutch, see github.com/xunit/xunit/issues/2347
 
-            var request = new HttpRequestMessage(HttpMethod.Post, _createOrderPath);
+            var request = new HttpRequestMessage(HttpMethod.Post, CreateOrderPath);
             request.Content = JsonContent.Create(orderItems);
             var response = await _client.SendAsync(request);
 
@@ -49,7 +52,7 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         [MemberData(nameof(CustomerData.CorrectOrderItems), MemberType = typeof(CustomerData))]
         public async Task CreateOrder_ReturnsUnauthorized_WhenWrongTokenPassed(IEnumerable<OrderItem> orderItems)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, _createOrderPath);
+            var request = new HttpRequestMessage(HttpMethod.Post, CreateOrderPath);
             request.Content = JsonContent.Create(orderItems);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "SomeInvalidTokenValue");
             var response = await _client.SendAsync(request);
@@ -61,7 +64,7 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         [MemberData(nameof(CustomerData.IncorrectOrderItems), MemberType = typeof(CustomerData))]
         public async Task CreateOrder_ReturnsBadRequest_WhenOrderInvalid(IEnumerable<OrderItem> orderItems)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, _createOrderPath);
+            var request = new HttpRequestMessage(HttpMethod.Post, CreateOrderPath);
             request.Content = JsonContent.Create(orderItems);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
             var response = await _client.SendAsync(request);
@@ -73,15 +76,14 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         [MemberData(nameof(CustomerData.CorrectOrderItems), MemberType = typeof(CustomerData))]
         public async Task CreateOrder_ReturnsCreated_WhenValidTokenPassed(IEnumerable<OrderItem> orderItems)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, _createOrderPath);
+            var request = new HttpRequestMessage(HttpMethod.Post, CreateOrderPath);
             request.Content = JsonContent.Create(orderItems);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
             var response = await _client.SendAsync(request);
 
-            _freshOrderId = response.Headers.Location?.Segments.Last();
-
-            var ex = Record.Exception(() => Guid.Parse(_freshOrderId));
-
+            _orderId = response.Headers.Location?.Segments.Last();
+            var ex = Record.Exception(() => new Guid(_orderId));
+            
             Assert.Null(ex);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         }
@@ -90,7 +92,7 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         [MemberData(nameof(CustomerData.CorrectOrderItems), MemberType = typeof(CustomerData))]
         public async Task CreateOrder_ReturnsNotImplemented_WhenCustomerHasActiveOrder(IEnumerable<OrderItem> orderItems)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, _createOrderPath);
+            var request = new HttpRequestMessage(HttpMethod.Post, CreateOrderPath);
             request.Content = JsonContent.Create(orderItems);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
             var response = await _client.SendAsync(request);
@@ -101,7 +103,7 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         [Fact, TestPriority(6)]
         public async Task CancelOrder_ReturnsBadRequest_WhenGuidInvalid()
         {
-            var url = string.Format(_cancelOrderPath, "000-0-12345");
+            var url = string.Format(CancelOrderPath, "000-0-12345");
             var request = new HttpRequestMessage(HttpMethod.Post, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
             var response = await _client.SendAsync(request);
@@ -112,7 +114,7 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         [Fact, TestPriority(7)]
         public async Task CancelOrder_ReturnsNotFound_WhenNoSuchOrder()
         {
-            var url = string.Format(_cancelOrderPath, Guid.NewGuid());
+            var url = string.Format(CancelOrderPath, Guid.NewGuid());
             var request = new HttpRequestMessage(HttpMethod.Post, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
             var response = await _client.SendAsync(request);
@@ -121,9 +123,9 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         }
 
         [Fact, TestPriority(7)]
-        public async Task CancelOrder_ReturnsForbidden_WhenTryCancelSomeoneElsesOrder()
+        public async Task CancelOrder_ReturnsForbidden_WhenTryCancelSomeoneElseOrder()
         {
-            var url = string.Format(_cancelOrderPath, "61A396CD-DA3E-5048-9BCD-3A849772379E");
+            var url = string.Format(CancelOrderPath, "61A396CD-DA3E-5048-9BCD-3A849772379E");
             var request = new HttpRequestMessage(HttpMethod.Post, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
             var response = await _client.SendAsync(request);
@@ -134,7 +136,7 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         [Fact, TestPriority(8)]
         public async Task CancelOrder_ReturnsNotImplemented_WhenTryCancelFinishedOrder()
         {
-            var url = string.Format(_cancelOrderPath, "CC702242-895D-3EFA-BBD5-61268913AABC");
+            var url = string.Format(CancelOrderPath, "CC702242-895D-3EFA-BBD5-61268913AABC");
             var request = new HttpRequestMessage(HttpMethod.Post, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
             var response = await _client.SendAsync(request);
@@ -142,23 +144,24 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
             Assert.Equal(HttpStatusCode.NotImplemented, response.StatusCode);
         }
 
-        // this test fails because of github.com/xunit/xunit/issues/2347
-        // as long as I cannot save id of the created order
+        // cannot save id of the created order because of github.com/xunit/xunit/issues/2347
         [Fact, TestPriority(9)]
         public async Task CancelOrder_ReturnsOk_WhenOrderCancelled()
         {
-            var url = string.Format(_cancelOrderPath, _freshOrderId);
+            //var orderId = (await _orderManager.GetNextOrderAsync())?.Id;
+
+            var url = string.Format(CancelOrderPath, _orderId);
             var request = new HttpRequestMessage(HttpMethod.Post, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
             var response = await _client.SendAsync(request);
 
-            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Fact, TestPriority(10)]
         public async Task GetByGuidAsync_ReturnsNotFound_WhenNoSuchOrder()
         {
-            var url = string.Format(_getOrderPath, Guid.NewGuid());
+            var url = string.Format(GetOrderPath, Guid.NewGuid());
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
             var response = await _client.SendAsync(request);
@@ -167,9 +170,9 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         }
 
         [Fact, TestPriority(11)]
-        public async Task GetByGuidAsync_ReturnsForbidden_WhenTryGetSomeoneElsesOrder()
+        public async Task GetByGuidAsync_ReturnsForbidden_WhenTryGetSomeoneElseOrder()
         {
-            var url = string.Format(_getOrderPath, "B006F4FC-9D0B-3D0E-97B5-E229F8EB520D");
+            var url = string.Format(GetOrderPath, "B006F4FC-9D0B-3D0E-97B5-E229F8EB520D");
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
             var response = await _client.SendAsync(request);
@@ -180,7 +183,7 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         [Fact, TestPriority(12)]
         public async Task GetByGuidAsync_ReturnsOrder_WhenTryGetYourOrder()
         {
-            var url = string.Format(_getOrderPath, "CC702242-895D-3EFA-BBD5-61268913AABC");
+            var url = string.Format(GetOrderPath, "CC702242-895D-3EFA-BBD5-61268913AABC");
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
             var response = await _client.SendAsync(request);
@@ -194,7 +197,7 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         [Fact, TestPriority(13)]
         public async Task GetStock_ReturnsStock()
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, _getStockPath);
+            var request = new HttpRequestMessage(HttpMethod.Get, GetStockPath);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
             var response = await _client.SendAsync(request);
 

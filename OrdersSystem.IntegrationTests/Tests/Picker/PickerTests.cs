@@ -14,15 +14,15 @@ namespace OrdersSystem.IntegrationTests.Tests.Picker
     [TestCaseOrderer("OrdersSystem.IntegrationTests.Helper.Prioritize.PriorityOrderer", "OrdersSystem.IntegrationTests")]
     public class PickerTests : IClassFixture<WebApplicationFactory<Program>>
     {
-        private const string _finishOrderPath = "/api/pickers/finish/{0}";
-        private const string _assignOrderPath = "/api/pickers/assign";
-        private readonly HttpClient _client;
+        private const string FinishOrderPath = "/api/pickers/finish/{0}";
+        private const string AssignOrderPath = "/api/pickers/assign";
         private readonly IOrderFlowManager _orderManager;
+        private readonly HttpClient _client;
         private readonly string? _token;
-        private string? _freshOrderId;
-
-        public PickerTests(WebApplicationFactory<Program> factory)
+        private readonly string _freshOrderId;
+        public PickerTests(IOrderFlowManager orderFlowManager, WebApplicationFactory<Program> factory)
         {
+            _orderManager = orderFlowManager;
             _client = factory.CreateClient();
             _token = JwtHelper.GetTokenAsync(_client, new LoginModel
             {
@@ -36,7 +36,7 @@ namespace OrdersSystem.IntegrationTests.Tests.Picker
         {
             await RefreshData.RefreshForCustomerTestsAsync(_client);
 
-            var request = new HttpRequestMessage(HttpMethod.Post, _assignOrderPath);
+            var request = new HttpRequestMessage(HttpMethod.Post, AssignOrderPath);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
             var response = await _client.SendAsync(request);
 
@@ -48,12 +48,11 @@ namespace OrdersSystem.IntegrationTests.Tests.Picker
         {
             await RefreshData.RefreshForPickerTestsAsync(_client);
 
-            var request = new HttpRequestMessage(HttpMethod.Post, _assignOrderPath);
+            var request = new HttpRequestMessage(HttpMethod.Post, AssignOrderPath);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
             var response = await _client.SendAsync(request);
 
             var orderDto = await response.Content.ReadFromJsonAsync<OrderDto>();
-            _freshOrderId = orderDto?.Id.ToString();
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal(OrderStatus.Processing, orderDto?.OrderStatus);
@@ -64,7 +63,7 @@ namespace OrdersSystem.IntegrationTests.Tests.Picker
         [MemberData(nameof(PickerData.IncorrectOrderItems), MemberType = typeof(PickerData))]
         public async Task FinishOrder_ReturnsBadRequest_WhenOrderInvalid(IEnumerable<OrderItem> orderItems)
         {
-            var url = string.Format(_finishOrderPath, _freshOrderId);
+            var url = string.Format(FinishOrderPath, _freshOrderId);
 
             var request = new HttpRequestMessage(HttpMethod.Post, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
@@ -84,7 +83,7 @@ namespace OrdersSystem.IntegrationTests.Tests.Picker
 
             await _orderManager.BeginOrderPickingAsync(order, new Guid("1BC67FB0-8D10-91F2-BF50-CFB0E7552417"));
 
-            var url = string.Format(_finishOrderPath, order.Id);
+            var url = string.Format(FinishOrderPath, order.Id);
 
             var request = new HttpRequestMessage(HttpMethod.Post, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
@@ -98,7 +97,7 @@ namespace OrdersSystem.IntegrationTests.Tests.Picker
         [MemberData(nameof(PickerData.CorrectOrderItems), MemberType = typeof(PickerData))]
         public async Task FinishOrder_ReturnsNotFound_WhenNoOrderWithThisId(IEnumerable<OrderItem> orderItems)
         {
-            var url = string.Format(_finishOrderPath, "B9062C62-9A5D-A0FB-CDBA-EB80445E1187");
+            var url = string.Format(FinishOrderPath, "B9062C62-9A5D-A0FB-CDBA-EB80445E1187");
 
             var request = new HttpRequestMessage(HttpMethod.Post, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
@@ -118,7 +117,7 @@ namespace OrdersSystem.IntegrationTests.Tests.Picker
 
             await _orderManager.BeginOrderPickingAsync(order, new Guid("EA6908D8-8F45-6F5F-A9FF-22A4050FF300"));
 
-            var url = string.Format(_finishOrderPath, order.Id);
+            var url = string.Format(FinishOrderPath, order.Id);
 
             var request = new HttpRequestMessage(HttpMethod.Post, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
@@ -138,7 +137,7 @@ namespace OrdersSystem.IntegrationTests.Tests.Picker
 
             await _orderManager.BeginOrderPickingAsync(order, new Guid("EA6908D8-8F45-6F5F-A9FF-22A4050FF300"));
 
-            var url = string.Format(_finishOrderPath, order.Id);
+            var url = string.Format(FinishOrderPath, order.Id);
 
             var request = new HttpRequestMessage(HttpMethod.Post, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
