@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
-using OrdersSystem.Data.Process.Services;
-using OrdersSystem.Domain.Models.Auth;
-using OrdersSystem.Domain.Models.Dto;
+﻿using OrdersSystem.Domain.Models.Dto;
 using OrdersSystem.Domain.Models.Ordering;
 using OrdersSystem.Domain.Models.Stock;
 using OrdersSystem.IntegrationTests.Helper.DataManipulation;
@@ -13,37 +10,28 @@ using System.Net.Http.Json;
 namespace OrdersSystem.IntegrationTests.Tests.Customer
 {
     [TestCaseOrderer("OrdersSystem.IntegrationTests.Helper.Prioritize.PriorityOrderer", "OrdersSystem.IntegrationTests")]
-    public class CustomerTests : IClassFixture<WebApplicationFactory<Program>>
+    public class CustomerTests : IClassFixture<CustomerFixture>
     {
         private const string CreateOrderPath = "/api/customers/create_order";
         private const string CancelOrderPath = "/api/customers/cancel_order/{0}";
         private const string GetOrderPath = "/api/customers/get_order/{0}";
         private const string GetStockPath = "/api/customers/get_stock";
-        private readonly IOrderFlowManager _orderManager;
-        private readonly HttpClient _client;
-        private readonly string? _token;
-        private string? _orderId;
-        
-        public CustomerTests(IOrderFlowManager orderFlowManager, WebApplicationFactory<Program> factory)
+        private readonly CustomerFixture _testFixture;
+
+        public CustomerTests(CustomerFixture customerFixture)
         {
-            _orderManager = orderFlowManager;
-            _client = factory.CreateClient();
-            _token = JwtHelper.GetTokenAsync(_client, new LoginModel
-            {
-                Username = "Aliya_Cruickshank",
-                Password = "PVBCbyoW"
-            }).Result;
+            _testFixture = customerFixture;
         }
 
         [Theory, TestPriority(1)]
         [MemberData(nameof(CustomerData.CorrectOrderItems), MemberType = typeof(CustomerData))]
         public async Task CreateOrder_ReturnsUnauthorized_WhenNoTokenPassed(IEnumerable<OrderItem> orderItems)
         {
-            await RefreshData.RefreshForCustomerTestsAsync(_client); // clutch, see github.com/xunit/xunit/issues/2347
+            await RefreshData.RefreshForCustomerTestsAsync(_testFixture.Client);
 
             var request = new HttpRequestMessage(HttpMethod.Post, CreateOrderPath);
             request.Content = JsonContent.Create(orderItems);
-            var response = await _client.SendAsync(request);
+            var response = await _testFixture.Client.SendAsync(request);
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
         }
@@ -55,7 +43,7 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
             var request = new HttpRequestMessage(HttpMethod.Post, CreateOrderPath);
             request.Content = JsonContent.Create(orderItems);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "SomeInvalidTokenValue");
-            var response = await _client.SendAsync(request);
+            var response = await _testFixture.Client.SendAsync(request);
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
         }
@@ -66,8 +54,8 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         {
             var request = new HttpRequestMessage(HttpMethod.Post, CreateOrderPath);
             request.Content = JsonContent.Create(orderItems);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
-            var response = await _client.SendAsync(request);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _testFixture.Token);
+            var response = await _testFixture.Client.SendAsync(request);
 
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
@@ -78,11 +66,11 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         {
             var request = new HttpRequestMessage(HttpMethod.Post, CreateOrderPath);
             request.Content = JsonContent.Create(orderItems);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
-            var response = await _client.SendAsync(request);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _testFixture.Token);
+            var response = await _testFixture.Client.SendAsync(request);
 
-            _orderId = response.Headers.Location?.Segments.Last();
-            var ex = Record.Exception(() => new Guid(_orderId));
+            _testFixture.OrderId = response.Headers.Location?.Segments.Last();
+            var ex = Record.Exception(() => new Guid(_testFixture.OrderId));
             
             Assert.Null(ex);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -94,8 +82,8 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         {
             var request = new HttpRequestMessage(HttpMethod.Post, CreateOrderPath);
             request.Content = JsonContent.Create(orderItems);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
-            var response = await _client.SendAsync(request);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _testFixture.Token);
+            var response = await _testFixture.Client.SendAsync(request);
 
             Assert.Equal(HttpStatusCode.NotImplemented, response.StatusCode);
         }
@@ -105,8 +93,8 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         {
             var url = string.Format(CancelOrderPath, "000-0-12345");
             var request = new HttpRequestMessage(HttpMethod.Post, url);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
-            var response = await _client.SendAsync(request);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _testFixture.Token);
+            var response = await _testFixture.Client.SendAsync(request);
 
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
@@ -116,8 +104,8 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         {
             var url = string.Format(CancelOrderPath, Guid.NewGuid());
             var request = new HttpRequestMessage(HttpMethod.Post, url);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
-            var response = await _client.SendAsync(request);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _testFixture.Token);
+            var response = await _testFixture.Client.SendAsync(request);
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
@@ -127,8 +115,8 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         {
             var url = string.Format(CancelOrderPath, "61A396CD-DA3E-5048-9BCD-3A849772379E");
             var request = new HttpRequestMessage(HttpMethod.Post, url);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
-            var response = await _client.SendAsync(request);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _testFixture.Token);
+            var response = await _testFixture.Client.SendAsync(request);
 
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }
@@ -138,22 +126,19 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         {
             var url = string.Format(CancelOrderPath, "CC702242-895D-3EFA-BBD5-61268913AABC");
             var request = new HttpRequestMessage(HttpMethod.Post, url);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
-            var response = await _client.SendAsync(request);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _testFixture.Token);
+            var response = await _testFixture.Client.SendAsync(request);
 
             Assert.Equal(HttpStatusCode.NotImplemented, response.StatusCode);
         }
 
-        // cannot save id of the created order because of github.com/xunit/xunit/issues/2347
         [Fact, TestPriority(9)]
         public async Task CancelOrder_ReturnsOk_WhenOrderCancelled()
         {
-            //var orderId = (await _orderManager.GetNextOrderAsync())?.Id;
-
-            var url = string.Format(CancelOrderPath, _orderId);
+            var url = string.Format(CancelOrderPath, _testFixture.OrderId);
             var request = new HttpRequestMessage(HttpMethod.Post, url);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
-            var response = await _client.SendAsync(request);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _testFixture.Token);
+            var response = await _testFixture.Client.SendAsync(request);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
@@ -163,8 +148,8 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         {
             var url = string.Format(GetOrderPath, Guid.NewGuid());
             var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
-            var response = await _client.SendAsync(request);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _testFixture.Token);
+            var response = await _testFixture.Client.SendAsync(request);
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
@@ -174,8 +159,8 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         {
             var url = string.Format(GetOrderPath, "B006F4FC-9D0B-3D0E-97B5-E229F8EB520D");
             var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
-            var response = await _client.SendAsync(request);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _testFixture.Token);
+            var response = await _testFixture.Client.SendAsync(request);
 
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }
@@ -185,8 +170,8 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         {
             var url = string.Format(GetOrderPath, "CC702242-895D-3EFA-BBD5-61268913AABC");
             var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
-            var response = await _client.SendAsync(request);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _testFixture.Token);
+            var response = await _testFixture.Client.SendAsync(request);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
@@ -198,8 +183,8 @@ namespace OrdersSystem.IntegrationTests.Tests.Customer
         public async Task GetStock_ReturnsStock()
         {
             var request = new HttpRequestMessage(HttpMethod.Get, GetStockPath);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
-            var response = await _client.SendAsync(request);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _testFixture.Token);
+            var response = await _testFixture.Client.SendAsync(request);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
