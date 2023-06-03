@@ -16,22 +16,22 @@ using OrdersSystem.Domain.Time;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers(options =>
-    {
-        options.SuppressAsyncSuffixInActionNames = false;
-    });
+{
+    options.SuppressAsyncSuffixInActionNames = false;
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "Ordering system", Version = "v1" });
     //options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Ordering system.xml"));
-    //options.IncludeXmlComments("C:\\Users\\Павел\\Desktop\\OrdersSystem\\OrdersSystem.Api\\Ordering system.xml");
-    options.IncludeXmlComments("C:\\Users\\zubda\\source\\repos\\OrdersSystem\\OrdersSystem.Api\\Ordering system.xml");
+    options.IncludeXmlComments("C:\\Users\\Павел\\Desktop\\OrdersSystem\\OrdersSystem.Api\\Ordering system.xml");
+    //options.IncludeXmlComments("C:\\Users\\zubda\\source\\repos\\OrdersSystem\\OrdersSystem.Api\\Ordering system.xml");
 });
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<ApplicationContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("LaptopConnection"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DesktopConnection"));
 });
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.Section));
