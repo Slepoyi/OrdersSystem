@@ -5,8 +5,8 @@ namespace OrdersSystem.IntegrationTests.Tests.Picker
     public class PickerData
     {
         public static IEnumerable<object[]> CorrectOrderItems =>
-          new List<object[]>
-          {
+            new List<object[]>
+            {
                 new object[]
                 {
                     new List<OrderItem>
@@ -28,8 +28,8 @@ namespace OrdersSystem.IntegrationTests.Tests.Picker
                         }
                     }
                 }
-          };
-
+            };
+      
         public static IEnumerable<object[]> CorrectOrderItemsQuantityCutInHalf =>
            new List<object[]>
            {
@@ -79,7 +79,10 @@ namespace OrdersSystem.IntegrationTests.Tests.Picker
                             SkuId = new Guid("B9062C62-9A5D-A0FB-CDBA-EB80445E1187"),
                             Quantity = 2
                         }
-                    },
+                    }
+                },
+                new object[]
+                {
                     // unexisting skuid
                     new List<OrderItem>
                     {
