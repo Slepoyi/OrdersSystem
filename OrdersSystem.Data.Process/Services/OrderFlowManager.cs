@@ -69,9 +69,9 @@ namespace OrdersSystem.Data.Process.Services
             return _applicationContext.StockItems.Include(s => s.Sku).AsEnumerable();
         }
 
-        public Task<Order?> GetNextOrderAsync()
+        public async Task<Order?> GetNextOrderAsync()
         {
-            return _applicationContext.Orders.
+            return await _applicationContext.Orders.
                 OrderBy(o => o.OpenTime).
                 Include(o => o.OrderItems).
                 FirstOrDefaultAsync(o => o.OrderStatus == OrderStatus.Created);
@@ -103,7 +103,7 @@ namespace OrdersSystem.Data.Process.Services
 
             foreach (var item in order.OrderItems)
             {
-                var oi = orderItems.FirstOrDefault(i => i.Id == item.Id);
+                var oi = orderItems.FirstOrDefault(i => i.SkuId == item.SkuId);
                 item.Quantity = oi.Quantity;
             }
 
