@@ -32,10 +32,10 @@ namespace OrdersSystem.Api.Controllers
         /// <returns>Ok</returns>
         /// <response code="200">Returns confirmation of DbSets refreshing</response>
         [HttpPost("_refresh_picker/")]
-        public IActionResult RefreshDbPicker()
+        public async Task<IActionResult> RefreshDbPicker()
         {
-            _dbSetsRefresher.RefreshForPickerTests();
-            return Ok();
+            await _dbSetsRefresher.RefreshForPickerTestsAsync();
+            return Ok();         
         }
     }
 }

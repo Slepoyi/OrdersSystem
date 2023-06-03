@@ -4,6 +4,6 @@
     {
         void RefreshForCustomerTests();
 
-        void RefreshForPickerTests();
+        Task RefreshForPickerTestsAsync();
     }
 }

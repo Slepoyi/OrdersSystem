@@ -20,8 +20,9 @@ namespace OrdersSystem.Data.Process.DataRefresh
             _dataGenerator = dataGenerator;
         }
 
-        public void RefreshForPickerTests()
+        public async Task RefreshForPickerTestsAsync()
         {
+            RefreshForCustomerTests();
             var orderItems = new List<OrderItem>
             {
                 new OrderItem
@@ -32,16 +33,16 @@ namespace OrdersSystem.Data.Process.DataRefresh
                 new OrderItem
                 {
                     SkuId = new Guid("613DCD97-383E-ADD6-4E28-337396AD9585"),
-                    Quantity = 2
+                    Quantity = 4
                 },
                 new OrderItem
                 {
                     SkuId = new Guid("833C33B0-35A1-84B3-01B6-68F725707101"),
-                    Quantity = 1
+                    Quantity = 2
                 }
             };
             var stock = _orderFlowManager.GetStockForOrderItems(orderItems);
-            var result = _orderFlowManager.CreateOrderAsync(orderItems, new Guid(""), stock);
+            var result = await _orderFlowManager.CreateOrderAsync(orderItems, new Guid("CE9EC503-29C7-1775-741C-27AED0FB0850"), stock);
         }
 
         public void RefreshForCustomerTests()
