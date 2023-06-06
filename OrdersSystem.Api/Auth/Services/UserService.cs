@@ -6,12 +6,10 @@ namespace OrdersSystem.Api.Auth.Services
 {
     public class UserService : IUserService
     {
-        private readonly ICryptoProvider _cryptoProvider;
         private readonly ApplicationContext _applicationContext;
 
-        public UserService(ICryptoProvider cryptoProvider, ApplicationContext applicationContext)
+        public UserService(ApplicationContext applicationContext)
         {
-            _cryptoProvider = cryptoProvider;
             _applicationContext = applicationContext;
         }
 
@@ -34,7 +32,6 @@ namespace OrdersSystem.Api.Auth.Services
                 return false;
 
             return passwordHash == password;
-            //return user.Password == _cryptoProvider.CreateCryptoString(password);
         }
     }
 }
